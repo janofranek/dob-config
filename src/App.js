@@ -10,9 +10,6 @@ import NoPage from './page/NoPage';
 import { AuthProvider } from "./data/AuthProvider"
 import { UsersDataProvider } from "./data/UsersDataProvider"
 import { CurrentCustomerProvider } from "./data/CurrentCustomerProvider"
-// import { TournamentsDataProvider } from "./data/TournamentsDataProvider"
-// import { ScorecardsDataProvider } from "./data/ScorecardsDataProvider"
-
 
 function AppRouter() {
   return (
@@ -38,11 +35,7 @@ function App() {
     <AuthProvider>
       <UsersDataProvider>
         <CurrentCustomerProvider>
-          {/* <TournamentsDataProvider> */}
-            {/* <ScorecardsDataProvider> */}
-              <AppRouter/>
-            {/* </ScorecardsDataProvider> */}
-          {/* </TournamentsDataProvider> */}
+          <AppRouter/>
         </CurrentCustomerProvider>
       </UsersDataProvider>
     </AuthProvider>

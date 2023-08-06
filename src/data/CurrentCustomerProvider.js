@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import { db } from '../cred/firebase';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useAuth } from '../data/AuthProvider';
 import { useUsers } from './UsersDataProvider';
 import { getCurrentUser } from './DataUtils';
@@ -15,21 +15,23 @@ export const CurrentCustomerProvider = ({ children }) => {
   const currentUser = getCurrentUser( users, authEmail);
 
   useEffect( () => {
-    const fetchCustomer = async () => {
-      if (!currentUser) {
-        setCustomer(null)
-      } else {
-        const docSnap = await getDoc(doc(db, "customers", currentUser.customerId))
-        if (docSnap.exists()) {
-          setCustomer({...docSnap.data(), id:docSnap.id })
-        } else {
-          setCustomer(null)
-        }
+    if (!currentUser) {
+      setCustomer(null)
+    } else {
+      const unsub = onSnapshot(doc(db, "customers", currentUser.customerId),
+        (doc) => {
+          setCustomer({...doc.data(), id:doc.id });
+        },
+        (error) => {
+          console.log("Nepovedlo se načíst klienta")
+        });
+      return () => { 
+        unsub();
+        setCustomer(null) 
       }
-    } 
-    fetchCustomer();
-    return () => { setCustomer(null) };
+    }
   }, [currentUser])
+
 
   return (
     <Context.Provider value={customer}>
