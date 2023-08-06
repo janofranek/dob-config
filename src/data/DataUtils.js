@@ -30,6 +30,31 @@ const addTemplate = async (customerId, newTemplate) => {
     }
 }
 
+const addTemplatePosition = async (customerId, templateIndex, newPosition) => {
+    const customerRef = doc(db, "customers", customerId);
+    const docSnap = await getDoc(customerRef);
+
+    console.log("addTemplatePosition")
+
+    if (docSnap.exists()) {
+        var newData = docSnap.data();
+        if (!("templates" in newData)) {
+            console.log("addTemplatePosition - No templates in document!");
+        } else if (newData.templates.length < templateIndex + 1) {
+            console.log("addTemplatePosition - No template on given index!");
+        } else {
+            if (!("positions" in newData.templates[templateIndex])) {
+            newData.templates[templateIndex]["positions"] = [];
+            }
+            newData.templates[templateIndex].positions.push(newPosition)
+            console.log(newData)
+            await updateDoc(customerRef, newData)
+        }
+    } else {
+        console.log("addTemplatePosition - No such document!");
+    }
+}
+
 const removeTemplate = async (customerId, templateIndex) => {
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
@@ -43,4 +68,33 @@ const removeTemplate = async (customerId, templateIndex) => {
     }
 }
 
-export {getCurrentUser, setConfiguration, addTemplate, removeTemplate}
+const removeTemplatePosition = async (customerId, templateIndex, positionIndex) => {
+    const customerRef = doc(db, "customers", customerId);
+    const docSnap = await getDoc(customerRef);
+
+    if (docSnap.exists()) {
+        var newData = docSnap.data();
+        if (!("templates" in newData)) {
+            console.log("removeTemplatePosition - No templates in document!");
+        } else if (newData.templates.length < templateIndex + 1) {
+            console.log("removeTemplatePosition - No template on given index!");
+        } else if (!("positions" in newData.templates[templateIndex])) {
+            console.log("removeTemplatePosition - No positions in template!");
+        } else if (newData.templates[templateIndex].positions.length < positionIndex + 1) {
+            console.log("removeTemplatePosition - No position on given index!");
+        } else {
+            newData.templates[templateIndex].positions.splice(positionIndex, 1)
+            await updateDoc(customerRef, newData)
+        }
+    } else {
+      console.log("removeTemplatePosition - No such document!");
+    }
+}
+
+export {    getCurrentUser, 
+            setConfiguration, 
+            addTemplate, 
+            removeTemplate, 
+            addTemplatePosition, 
+            removeTemplatePosition
+        }

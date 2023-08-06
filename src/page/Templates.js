@@ -3,28 +3,40 @@ import { Navigate } from "react-router-dom";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { Container, Row, Col } from "react-bootstrap";
-import TemplateDetail from "./TemplateDetail"
 import TemplatesList from "./TemplatesList"
+import TemplateDetail from "./TemplateDetail"
+import PositionsList from './PositionsList';
 import TemplateEditModal from './TemplateEditModal';
+import PositionEditModal from './PositionEditModal';
 
 
 const Templates = () => {
 
   const [templateIndex, setTemplateIndex] = useState('0')
-  const [displayEditModal, setDisplayEditModal] = useState(false);
+  const [displayTemplateEdit, setDisplayTemplateEdit] = useState(false);
+  const [displayPositionEdit, setDisplayPositionEdit] = useState(false);
 
   const onListClick = (e) => {
     e.preventDefault();
     setTemplateIndex(e.target.id);
   }
 
-  const hideEditModal = () => {
-    setDisplayEditModal(false);
+  const hideTemplateEdit = () => {
+    setDisplayTemplateEdit(false);
   };
 
-  const onNewClick = (e) => {
+  const hidePositionEdit = () => {
+    setDisplayPositionEdit(false);
+  };
+
+  const onNewTemplateClick = (e) => {
     e.preventDefault();
-    setDisplayEditModal(true);
+    setDisplayTemplateEdit(true);
+  }
+
+  const onNewPositionClick = (e) => {
+    e.preventDefault();
+    setDisplayPositionEdit(true);
   }
 
   //load data
@@ -40,18 +52,28 @@ const Templates = () => {
       <Container>
         <Row>
           <Col>
-            <TemplatesList onListClick={onListClick} onNewClick={onNewClick}/>
+            <TemplatesList onListClick={onListClick} onNewClick={onNewTemplateClick}/>
           </Col>
           <Col>
             <TemplateDetail templateIndex={templateIndex}/>
           </Col>
+          <Col>
+            <PositionsList templateIndex={templateIndex} onNewClick={onNewPositionClick}/>
+          </Col>
         </Row>
       </Container>
       <TemplateEditModal 
-        showModal={displayEditModal} 
-        hideModal={hideEditModal} 
+        showModal={displayTemplateEdit} 
+        hideModal={hideTemplateEdit} 
         mode="new"
       />
+      <PositionEditModal 
+        showModal={displayPositionEdit} 
+        hideModal={hidePositionEdit} 
+        templateIndex={templateIndex}
+        mode="new"
+      />
+      
     </>
   )
 
