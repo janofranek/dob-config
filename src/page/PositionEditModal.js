@@ -57,8 +57,9 @@ const PositionEditModal = (props) => {
     console.log("onSave - position")
 
     if (!positionName || !left || !top || !width || !height) {
-        return;
-        //TODO better validation + unique position name
+      console.log("onSave - position - error")
+      return;
+      //TODO better validation + unique position name
     }
 
     setDisabledSave();
@@ -70,7 +71,7 @@ const PositionEditModal = (props) => {
       "height": height
     }
     console.log(newPosition)
-    addTemplatePosition(currentCustomer.id, props.templateIndex, newPosition)
+    addTemplatePosition(currentCustomer.id, Number(props.templateIndex), newPosition)
     //TODO check errors
 
     props.hideModal()
@@ -99,6 +100,9 @@ const PositionEditModal = (props) => {
                 })}
               </Form.Select>
             </Form.Group>
+            <Form.Text>
+              Rozměry fotky: {props.imageProps.naturalWidth} x {props.imageProps.naturalHeight}
+            </Form.Text>
             <Row>
               <Col>
                 <InputNumber labelName="Zleva" numberName="left" onNumberChange={setLeft}/>

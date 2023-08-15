@@ -15,9 +15,12 @@ const Templates = () => {
   const [templateIndex, setTemplateIndex] = useState('0')
   const [displayTemplateEdit, setDisplayTemplateEdit] = useState(false);
   const [displayPositionEdit, setDisplayPositionEdit] = useState(false);
+  const [showPositionRect, setShowPositionRect] = useState({})
+  const [imageProps, setImageProps] = useState({})
 
-  const onListClick = (e) => {
+  const onTemplateListClick = (e) => {
     e.preventDefault();
+    setShowPositionRect({})
     setTemplateIndex(e.target.id);
   }
 
@@ -52,13 +55,24 @@ const Templates = () => {
       <Container>
         <Row>
           <Col>
-            <TemplatesList onListClick={onListClick} onNewClick={onNewTemplateClick}/>
+            <TemplatesList 
+              onListClick={onTemplateListClick} 
+              onNewClick={onNewTemplateClick}
+            />
           </Col>
           <Col>
-            <TemplateDetail templateIndex={templateIndex}/>
+            <TemplateDetail 
+              templateIndex={templateIndex} 
+              setImageProps={setImageProps}
+              showPositionRect={showPositionRect}
+            />
           </Col>
           <Col>
-            <PositionsList templateIndex={templateIndex} onNewClick={onNewPositionClick}/>
+            <PositionsList 
+              templateIndex={templateIndex}
+              onNewClick={onNewPositionClick} 
+              setShowPositionRect={setShowPositionRect}
+            />
           </Col>
         </Row>
       </Container>
@@ -70,6 +84,7 @@ const Templates = () => {
       <PositionEditModal 
         showModal={displayPositionEdit} 
         hideModal={hidePositionEdit} 
+        imageProps={imageProps}
         templateIndex={templateIndex}
         mode="new"
       />

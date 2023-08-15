@@ -21,7 +21,7 @@ const PositionsList = (props) => {
   }, [props, currentCustomer])
 
   const submitDelete = () => {
-    removeTemplatePosition(currentCustomer.id, props.templateIndex, positionIndex)
+    removeTemplatePosition(currentCustomer.id, Number(props.templateIndex), Number(positionIndex))
     setDisplayConfirmationModal(false);
   };
 
@@ -36,6 +36,21 @@ const PositionsList = (props) => {
     setDisplayConfirmationModal(true);
   }
 
+  const onPositionShow = (e) => {
+    e.preventDefault();
+
+    const newPosition = {
+      left: templateDataFromParent.positions[e.target.id].left,
+      top: templateDataFromParent.positions[e.target.id].top,
+      width: templateDataFromParent.positions[e.target.id].width,
+      height: templateDataFromParent.positions[e.target.id].height
+    }
+    props.setShowPositionRect(newPosition)
+  }
+
+  const onPositionEdit = (e) => {
+    e.preventDefault();
+  }
   //wait for data
   if (!currentCustomer ) return "Loading...";
 
@@ -73,7 +88,25 @@ const PositionsList = (props) => {
                       type="submit"
                       id={index}
                       onClick={onPositionDelete}>
-                      Smazat
+                      Smaž
+                    </Button>
+                    <br/>
+                    <Button
+                      variant="outline-info"
+                      size='sm'
+                      type="submit"
+                      id={index}
+                      onClick={onPositionShow}>
+                      Ukaž
+                    </Button>
+                    <br/>
+                    <Button
+                      variant="outline-primary"
+                      size='sm'
+                      type="submit"
+                      id={index}
+                      onClick={onPositionEdit}>
+                      Uprav
                     </Button>
                   </td>
                 </tr>

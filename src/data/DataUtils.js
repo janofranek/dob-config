@@ -34,8 +34,6 @@ const addTemplatePosition = async (customerId, templateIndex, newPosition) => {
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
 
-    console.log("addTemplatePosition")
-
     if (docSnap.exists()) {
         var newData = docSnap.data();
         if (!("templates" in newData)) {
@@ -52,6 +50,24 @@ const addTemplatePosition = async (customerId, templateIndex, newPosition) => {
         }
     } else {
         console.log("addTemplatePosition - No such document!");
+    }
+}
+
+const addSet = async (customerId, newSet ) => {
+    const customerRef = doc(db, "customers", customerId);
+    const docSnap = await getDoc(customerRef);
+
+    console.log("addSet")
+
+    if (docSnap.exists()) {
+        var newData = docSnap.data();
+        if (!("sets" in newData)) {
+            newData["sets"] = [];
+        }
+        newData.sets.push(newSet)
+        await updateDoc(customerRef, newData)
+    } else {
+      console.log("addSet - No such document!");
     }
 }
 
@@ -91,10 +107,25 @@ const removeTemplatePosition = async (customerId, templateIndex, positionIndex) 
     }
 }
 
+const removeSet = async (customerId, setIndex) => {
+    const customerRef = doc(db, "customers", customerId);
+    const docSnap = await getDoc(customerRef);
+
+    if (docSnap.exists()) {
+        var newData = docSnap.data();
+        newData.sets.splice(setIndex, 1)
+        await updateDoc(customerRef, newData)
+    } else {
+      console.log("removeSet - No such document!");
+    }
+}
+
 export {    getCurrentUser, 
             setConfiguration, 
             addTemplate, 
             removeTemplate, 
             addTemplatePosition, 
-            removeTemplatePosition
+            removeTemplatePosition,
+            addSet,
+            removeSet
         }

@@ -36,7 +36,6 @@ body {
 .outsideWrapper{ 
   height: 350px;
   width: 450px;
-  border:1px solid blue;
 }
 
 .insideWrapper{ 
