@@ -20,6 +20,7 @@ const InputNumber = (props) => {
           size='sm' 
           id={props.numberName}
           name={props.numberName}
+          value={props.value}
           required
           onChange={onChange}
         />
@@ -41,13 +42,21 @@ const PositionEditModal = (props) => {
 
   useEffect(() => {        
     if (props.mode === "new") {
-      setPositionName(null)
+      setPositionName("")
       setLeft(0)
       setTop(0)
       setWidth(0)
       setHeight(0)
+    } else if (props.mode === "edit" && currentCustomer) {
+      const position = currentCustomer.templates[props.templateIndex].positions[props.positionIndex]
+      setPositionName(position.positionName)
+      setLeft(position.left)
+      setTop(position.top)
+      setWidth(position.width)
+      setHeight(position.height)
+      console.log(position.positionName)
     }
-  }, [props.mode]);
+  }, [props, currentCustomer]);
 
   //wait for data
   if (!currentCustomer ) return "Loading...";
@@ -70,7 +79,6 @@ const PositionEditModal = (props) => {
       "width": width,
       "height": height
     }
-    console.log(newPosition)
     addTemplatePosition(currentCustomer.id, Number(props.templateIndex), newPosition)
     //TODO check errors
 
@@ -89,6 +97,8 @@ const PositionEditModal = (props) => {
                 id="positionName"
                 name="positionName"
                 placeholder='Zadej název pozice'
+                value={positionName}
+                // defaultValue={positionName}
                 required
                 onChange={(e)=>setPositionName(e.target.value)}
               >
@@ -105,18 +115,18 @@ const PositionEditModal = (props) => {
             </Form.Text>
             <Row>
               <Col>
-                <InputNumber labelName="Zleva" numberName="left" onNumberChange={setLeft}/>
+                <InputNumber labelName="Zleva" numberName="left" value={left} onNumberChange={setLeft}/>
               </Col>
               <Col>
-                <InputNumber labelName="Zhora" numberName="top" onNumberChange={setTop}/>
+                <InputNumber labelName="Zhora" numberName="top" value={top} onNumberChange={setTop}/>
               </Col>
             </Row>
             <Row>
               <Col>
-                <InputNumber labelName="Šířka" numberName="width" onNumberChange={setWidth}/>
+                <InputNumber labelName="Šířka" numberName="width" value={width} onNumberChange={setWidth}/>
               </Col>
               <Col>
-                <InputNumber labelName="Výška" numberName="height" onNumberChange={setHeight}/>
+                <InputNumber labelName="Výška" numberName="height" value={height} onNumberChange={setHeight}/>
               </Col>
             </Row>
           </Form>

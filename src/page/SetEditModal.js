@@ -13,11 +13,14 @@ const SetEditModal = (props) => {
   const currentCustomer = useCurrentCustomer();
 
   useEffect(() => {        
-    if (props.mode === "new") {
+    if (props.mode === "new" && currentCustomer) {
       setSetName(null);
       setSelectedTemplates([]);
+    } else if (props.mode === "edit" && currentCustomer) {
+      setSetName(currentCustomer.sets[props.setIndex].setName);
+      setSelectedTemplates(currentCustomer.sets[props.setIndex].setTemplates);
     }
-  }, [props]);
+  }, [props, currentCustomer]);
 
   //wait for data
   if (!currentCustomer ) return "Loading...";
@@ -69,6 +72,7 @@ const SetEditModal = (props) => {
                 id="setName"
                 name="setName"
                 placeholder='Zadej název skupiny'
+                value={setName}
                 required
                 onChange={(e)=>setSetName(e.target.value)}
               />

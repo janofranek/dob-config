@@ -48,9 +48,6 @@ const PositionsList = (props) => {
     props.setShowPositionRect(newPosition)
   }
 
-  const onPositionEdit = (e) => {
-    e.preventDefault();
-  }
   //wait for data
   if (!currentCustomer ) return "Loading...";
 
@@ -105,7 +102,7 @@ const PositionsList = (props) => {
                       size='sm'
                       type="submit"
                       id={index}
-                      onClick={onPositionEdit}>
+                      onClick={props.onEditClick}>
                       Uprav
                     </Button>
                   </td>

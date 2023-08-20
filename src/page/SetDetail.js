@@ -10,7 +10,7 @@ const SetDetail = (props) => {
 
   const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(null);
-  const [setDataFromParent, setSetDataFromParent] = useState({})
+  const [setDataFromParent, setSetDataFromParent] = useState({setName:"", setTemplates:[]})
   const currentCustomer = useCurrentCustomer();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const SetDetail = (props) => {
     if (props.setIndex && currentCustomer) {
       setSetDataFromParent(currentCustomer.sets[props.setIndex]);
     } else {
-      setSetDataFromParent({setName:null, setTemplates:[]});
+      setSetDataFromParent({setName:"", setTemplates:[]});
     }
   }, [props, currentCustomer])
 
@@ -27,8 +27,7 @@ const SetDetail = (props) => {
   if (!currentCustomer ) return "Loading...";
 
   const submitDelete = () => {
-    //TODO - nějak blbne
-    removeSet(currentCustomer.id, setDataFromParent.setIndex)
+    removeSet(currentCustomer.id, Number(props.setIndex))
     setDisplayConfirmationModal(false);
   };
 
@@ -40,11 +39,6 @@ const SetDetail = (props) => {
     e.preventDefault();
     setDeleteMessage(`Opravdu chceš smazat skupinu '${setDataFromParent.setName}'?`);
     setDisplayConfirmationModal(true);
-  }
-
-  const onEdit = (e) => {
-    e.preventDefault();
-    //TODO start modal for edit
   }
 
   const onTemplatesClick = (e) => {
@@ -62,19 +56,22 @@ const SetDetail = (props) => {
             size='sm' 
             id="setName"
             name="setName"
+            readOnly
             value={setDataFromParent.setName}
           />
         </Form.Group>
-        <SelectTemplates
-          templatesList={currentCustomer.templates}
-          selectedTemplates={setDataFromParent.setTemplates}
-          onTemplatesClick={onTemplatesClick}
-        />
+        <Form.Group>
+          <SelectTemplates
+            templatesList={currentCustomer.templates}
+            selectedTemplates={setDataFromParent.setTemplates}
+            onTemplatesClick={onTemplatesClick}
+          />
+        </Form.Group>
         <Button 
           variant="primary"
           size='sm'
           type='submit'
-          onClick={onEdit}>
+          onClick={props.onEditClick}>
           Uprav
         </Button>{" "}
         <Button 

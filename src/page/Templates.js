@@ -13,10 +13,13 @@ import PositionEditModal from './PositionEditModal';
 const Templates = () => {
 
   const [templateIndex, setTemplateIndex] = useState('0')
+  const [positionIndex, setPositionIndex] = useState(0)
   const [displayTemplateEdit, setDisplayTemplateEdit] = useState(false);
   const [displayPositionEdit, setDisplayPositionEdit] = useState(false);
   const [showPositionRect, setShowPositionRect] = useState({})
   const [imageProps, setImageProps] = useState({})
+  const [modeTemplateEdit, setModeTemplateEdit] = useState("new")
+  const [modePositionEdit, setModePositionEdit] = useState("new")
 
   const onTemplateListClick = (e) => {
     e.preventDefault();
@@ -26,19 +29,36 @@ const Templates = () => {
 
   const hideTemplateEdit = () => {
     setDisplayTemplateEdit(false);
+    setModeTemplateEdit("new")
   };
 
   const hidePositionEdit = () => {
     setDisplayPositionEdit(false);
+    setModePositionEdit("new")
   };
 
   const onNewTemplateClick = (e) => {
     e.preventDefault();
+    setModeTemplateEdit("new");
+    setDisplayTemplateEdit(true);
+  }
+
+  const onEditTemplateClick = (e) => {
+    e.preventDefault();
+    setModeTemplateEdit("edit");
     setDisplayTemplateEdit(true);
   }
 
   const onNewPositionClick = (e) => {
     e.preventDefault();
+    setModePositionEdit("new");
+    setDisplayPositionEdit(true);
+  }
+
+  const onEditPositionClick = (e) => {
+    e.preventDefault();
+    setPositionIndex(e.target.id)
+    setModePositionEdit("edit");
     setDisplayPositionEdit(true);
   }
 
@@ -65,12 +85,14 @@ const Templates = () => {
               templateIndex={templateIndex} 
               setImageProps={setImageProps}
               showPositionRect={showPositionRect}
+              onEditClick={onEditTemplateClick}
             />
           </Col>
           <Col>
             <PositionsList 
               templateIndex={templateIndex}
-              onNewClick={onNewPositionClick} 
+              onNewClick={onNewPositionClick}
+              onEditClick={onEditPositionClick} 
               setShowPositionRect={setShowPositionRect}
             />
           </Col>
@@ -78,15 +100,17 @@ const Templates = () => {
       </Container>
       <TemplateEditModal 
         showModal={displayTemplateEdit} 
-        hideModal={hideTemplateEdit} 
-        mode="new"
+        hideModal={hideTemplateEdit}
+        templateIndex={templateIndex} 
+        mode={modeTemplateEdit}
       />
       <PositionEditModal 
         showModal={displayPositionEdit} 
         hideModal={hidePositionEdit} 
         imageProps={imageProps}
         templateIndex={templateIndex}
-        mode="new"
+        positionIndex={positionIndex}
+        mode={modePositionEdit}
       />
       
     </>

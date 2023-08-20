@@ -11,6 +11,7 @@ const Sets = () => {
 
   const [setIndex, setSetIndex] = useState('0')
   const [displaySetEdit, setDisplaySetEdit] = useState(false);
+  const [modalMode, setModalMode] = useState("new")
 
   const onSetsListClick = (e) => {
     e.preventDefault();
@@ -19,6 +20,13 @@ const Sets = () => {
 
   const onNewSetClick = (e) => {
     e.preventDefault();
+    setModalMode("new");
+    setDisplaySetEdit(true);
+  }
+
+  const onEditSetClick = (e) => {
+    e.preventDefault();
+    setModalMode("edit");
     setDisplaySetEdit(true);
   }
 
@@ -39,14 +47,15 @@ const Sets = () => {
     <>
       <Container>
         <Row>
-          <Col>
+          <Col md="auto">
             <SetsList 
               onListClick={onSetsListClick} 
               onNewClick={onNewSetClick}            />
           </Col>
-          <Col>
+          <Col md="auto">
             <SetDetail 
               setIndex={setIndex} 
+              onEditClick={onEditSetClick}
             />
           </Col>
         </Row>
@@ -54,7 +63,8 @@ const Sets = () => {
       <SetEditModal 
         showModal={displaySetEdit} 
         hideModal={hideSetEdit} 
-        mode="new"
+        mode={modalMode}
+        setIndex={setIndex}
       />
     </>
   )

@@ -23,8 +23,14 @@ const addTemplate = async (customerId, newTemplate) => {
         if (!("templates" in newData)) {
             newData["templates"] = [];
         }
-        newData.templates.push(newTemplate)
-        await updateDoc(customerRef, newData)
+        //if exists edit, otherwise add
+        const indexExists = newData.templates.findIndex((template) => template.templateName === newTemplate.templateName)
+        if (indexExists === -1) {
+            newData.templates.push(newTemplate);
+        } else {
+            newData.templates[indexExists] = newTemplate;
+        }
+        await updateDoc(customerRef, newData);
     } else {
       console.log("addTemplate - No such document!");
     }
@@ -44,8 +50,13 @@ const addTemplatePosition = async (customerId, templateIndex, newPosition) => {
             if (!("positions" in newData.templates[templateIndex])) {
             newData.templates[templateIndex]["positions"] = [];
             }
-            newData.templates[templateIndex].positions.push(newPosition)
-            console.log(newData)
+            //if exists edit, otherwise add
+            const indexExists = newData.templates[templateIndex].positions.findIndex((pos) => pos.positionName === newPosition.positionName)
+            if (indexExists === -1) {
+                newData.templates[templateIndex].positions.push(newPosition)
+            } else {
+                newData.templates[templateIndex].positions[indexExists] = newPosition
+            }
             await updateDoc(customerRef, newData)
         }
     } else {
@@ -64,7 +75,13 @@ const addSet = async (customerId, newSet ) => {
         if (!("sets" in newData)) {
             newData["sets"] = [];
         }
-        newData.sets.push(newSet)
+        //if exists edit, otherwise add
+        const indexExists = newData.sets.findIndex((set) => set.setName === newSet.setName)
+        if (indexExists === -1) {
+            newData.sets.push(newSet)
+        } else {
+            newData.sets[indexExists] = newSet
+        }
         await updateDoc(customerRef, newData)
     } else {
       console.log("addSet - No such document!");
@@ -74,6 +91,10 @@ const addSet = async (customerId, newSet ) => {
 const removeTemplate = async (customerId, templateIndex) => {
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
+    
+    console.log("removeTemplate")
+    console.log(customerId)
+    console.log(templateIndex)
 
     if (docSnap.exists()) {
         var newData = docSnap.data();
@@ -110,6 +131,10 @@ const removeTemplatePosition = async (customerId, templateIndex, positionIndex) 
 const removeSet = async (customerId, setIndex) => {
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
+
+    console.log("removeSet")
+    console.log(customerId)
+    console.log(setIndex)
 
     if (docSnap.exists()) {
         var newData = docSnap.data();

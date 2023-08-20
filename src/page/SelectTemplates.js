@@ -32,14 +32,17 @@ const SelectTemplates = (props) => {
         <Form.Label className="col-form-label-sm">Vzory</Form.Label>
           {props.templatesList.map( (row, index) => {
             return (
-              <Form.Check
-                type='checkbox' 
-                key={index}
-                id={`${index}`}
-                checked={isCheckedLocal[index]}
-                onChange={onChange}
-                label={row.templateName}
-              />
+              <Form.Group>
+                <Form.Check
+                  type='checkbox' 
+                  inline
+                  key={index}
+                  id={`${index}`}
+                  checked={isCheckedLocal[index]}
+                  onChange={onChange}
+                />
+                <Form.Label className="col-form-label-sm">{row.templateName}</Form.Label>
+              </Form.Group>
             )
           })}
       </Form.Group>

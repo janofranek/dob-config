@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
-import { Button, Image, Form, ProgressBar, Modal } from "react-bootstrap";
-import { run as runHolder } from 'holderjs/holder';
+import { Button, Form, ProgressBar, Modal } from "react-bootstrap";
 import { storage } from '../cred/firebase';
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { addTemplate } from "../data/DataUtils"
@@ -11,7 +10,6 @@ const TemplateEditModal = (props) => {
   const [templateName, setTemplateName] = useState("")
   const [negative, setNegative] = useState(false)
   const [file, setFile] = useState(null)
-  const [imgUrl, setImgUrl] = useState(null);
   const [showProgress, setShowProgress] = useState(false);
   const [progresspercent, setProgresspercent] = useState(0);
   const [disabledSave, setDisabledSave] = useState(false);
@@ -19,14 +17,16 @@ const TemplateEditModal = (props) => {
   const currentCustomer = useCurrentCustomer();
 
   useEffect(() => {        
-    runHolder('image-class-name');
     if (props.mode === "new") {
-      setImgUrl(null)
       setTemplateName(null)
       setNegative(false)
       setFile(null)
+    } else if (props.mode === "edit" && currentCustomer) {
+      setTemplateName(currentCustomer.templates[props.templateIndex].templateName)
+      setNegative(currentCustomer.templates[props.templateIndex].negative)
+      setFile(null)
     }
-  }, [props.mode]);
+  }, [props, currentCustomer]);
 
   //wait for data
   if (!currentCustomer ) return "Loading...";
@@ -47,6 +47,11 @@ const TemplateEditModal = (props) => {
     addTemplate(currentCustomer.id, newTemplate);
   }
 
+  const justSave = () => {
+    saveTemplate(currentCustomer.templates[props.templateIndex].imageUrl);
+    props.hideModal();
+  }
+
   const uploadAndSave = (fileLocation) => {
     setShowProgress(true)
 
@@ -63,7 +68,6 @@ const TemplateEditModal = (props) => {
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImgUrl(downloadURL);
             saveTemplate(downloadURL);
             setShowProgress(false);
             props.hideModal()
@@ -75,14 +79,20 @@ const TemplateEditModal = (props) => {
   const onSave = (e) => {
     e.preventDefault();
 
-    if (!file || !templateName) return;
+    if (( !file && props.mode === "new" ) || !templateName) return;
     //TODO better validation + unique template name
 
     setDisabledSave();
 
-    const fileLocation = `${currentCustomer.id}/${templateName}_${file.name}`;
-    uploadAndSave(fileLocation);
-    //TODO check and report errors
+
+    if (!file && props.mode === "edit") {
+      justSave();
+    } else if (file) {
+      const fileLocation = `${currentCustomer.id}/${templateName}_${file.name}`;
+      uploadAndSave(fileLocation);
+      //TODO check and report errors
+    }
+
   }
 
   return (
@@ -90,8 +100,6 @@ const TemplateEditModal = (props) => {
       <Modal show={props.showModal} onHide={props.hideModal} backdrop="static">
         <Modal.Body>
 
-          { !imgUrl && <Image src="holder.js/300x300?text=Obrázek" /> } 
-          { imgUrl && <Image src={imgUrl} height={300}/> }
           { showProgress && <ProgressBar stripped variant="info" now={progresspercent} />}
           <Form>
             <Form.Group>
@@ -115,6 +123,7 @@ const TemplateEditModal = (props) => {
                 id="templateName"
                 name="templateName"
                 placeholder='Zadej název vzoru'
+                value={templateName}
                 required
                 onChange={(e)=>setTemplateName(e.target.value)}
               />
@@ -124,7 +133,7 @@ const TemplateEditModal = (props) => {
                 type="checkbox"
                 inline
                 id="negative"
-                defaultChecked={false}
+                checked={negative}
                 onChange={(e)=>setNegative(e.target.checked)}
               />
               <Form.Label className="col-form-label-sm">Použít negativ obrázku</Form.Label>

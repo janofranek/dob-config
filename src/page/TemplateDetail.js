@@ -24,7 +24,7 @@ const TemplateDetail = (props) => {
   if (!currentCustomer ) return "Loading...";
 
   const submitDelete = () => {
-    removeTemplate(currentCustomer.id, templateDataFromParent.templateIndex)
+    removeTemplate(currentCustomer.id, props.templateIndex)
     setDisplayConfirmationModal(false);
   };
 
@@ -40,7 +40,7 @@ const TemplateDetail = (props) => {
 
   const onEdit = (e) => {
     e.preventDefault();
-    //TODO start modal for edit
+    props.onEditClick(e);
   }
 
   return (
@@ -58,6 +58,7 @@ const TemplateDetail = (props) => {
             size='sm' 
             id="templateName"
             name="templateName"
+            readOnly
             value={templateDataFromParent.templateName}
           />
         </Form.Group>
@@ -66,6 +67,7 @@ const TemplateDetail = (props) => {
             type="checkbox"
             inline
             id="negative"
+            readOnly
             checked={templateDataFromParent.negative}
           />
           <Form.Label className="col-form-label-sm">Použít negativ obrázku</Form.Label>
