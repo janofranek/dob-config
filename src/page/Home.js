@@ -59,7 +59,7 @@ const Home = () => {
               <Card.Body>
                 <Card.Title>TODO - API</Card.Title>
                 <ListGroup variant='flush'>
-                  <ListGroup.Item>Napojení na konfiguraci v databázi</ListGroup.Item>
+                  <ListGroup.Item><s>Napojení na konfiguraci v databázi</s></ListGroup.Item>
                   <ListGroup.Item>Více obrázků najednou</ListGroup.Item>
                   <ListGroup.Item>Skupiny</ListGroup.Item>
                   <ListGroup.Item>Export konfigurace ?</ListGroup.Item>
