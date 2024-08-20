@@ -26,7 +26,7 @@ const ConfigForm = (props) => {
     const newData = {};
     newData["resultWidth"] = formData["resultWidth"] ?? config["resultWidth"]
     newData["resultHeight"] = formData["resultHeight"] ?? config["resultHeight"]
-    newData["resultWiresultBackgrounddth"] = formData["resultBackground"] ?? config["resultBackground"]
+    newData["resultBackground"] = formData["resultBackground"] ?? config["resultBackground"]
     setConfiguration(props.currentCustomer.id, newData)
     //TODO success confirmation
   }
