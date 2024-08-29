@@ -42,7 +42,7 @@ const TemplateEditModal = (props) => {
     const newTemplate = {
       "imageUrl": downloadURL,
       "templateName": templateName,
-      "negative": negative
+      "negative": Boolean(negative)
     }
     addTemplate(currentCustomer.id, newTemplate);
   }

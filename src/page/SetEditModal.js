@@ -1,29 +1,38 @@
 import React, {useEffect, useState} from 'react';
 import "./Common.css"
-import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Button, Form, Modal } from "react-bootstrap";
 import { addSet } from "../data/DataUtils"
 import SelectTemplates from './SelectTemplates';
+
+const existsTemplates = (currentCustomer) => {
+  if (!(typeof currentCustomer === "object")) {
+    return false
+  } else if (!("templates" in currentCustomer)) {
+    return false
+  } else if (!Array.isArray(currentCustomer.templates)) {
+    return false
+  } else if (currentCustomer.templates.length === 0) {
+    return false
+  } else {
+    return true
+  }
+}
 
 const SetEditModal = (props) => {
   const [setName, setSetName] = useState("")
   const [disabledSave, setDisabledSave] = useState(false);
   const [selectedTemplates, setSelectedTemplates] = useState([]);
 
-  const currentCustomer = useCurrentCustomer();
 
   useEffect(() => {        
-    if (props.mode === "new" && currentCustomer) {
+    if (props.mode === "new") {
       setSetName(null);
       setSelectedTemplates([]);
-    } else if (props.mode === "edit" && currentCustomer) {
-      setSetName(currentCustomer.sets[props.setIndex].setName);
-      setSelectedTemplates(currentCustomer.sets[props.setIndex].setTemplates);
+    } else if (props.mode === "edit") {
+      setSetName(props.currentCustomer.sets[props.setIndex].setName);
+      setSelectedTemplates(props.currentCustomer.sets[props.setIndex].setTemplates);
     }
-  }, [props, currentCustomer]);
-
-  //wait for data
-  if (!currentCustomer ) return "Loading...";
+  }, [props]);
 
   const onSave = (e) => {
     e.preventDefault();
@@ -40,23 +49,30 @@ const SetEditModal = (props) => {
         "setName": setName,
         "setTemplates": selectedTemplates
     }
-    addSet(currentCustomer.id, newSet)
+    addSet(props.currentCustomer.id, props.setIndex, newSet)
     //TODO check errors
 
     props.hideModal()
+    setSetName(null)
+    setSelectedTemplates([]);
+  }
+
+  const onCancel = (e) => {
+    e.preventDefault();
+    props.hideModal()
+    setSetName(null)
+    setSelectedTemplates([]);
   }
 
   const onTemplatesClick = (e) => {
     e.preventDefault();
-    const templateName = currentCustomer.templates[e.target.id].templateName;
+    const templateName = props.currentCustomer.templates[e.target.id].templateName;
 
     if ( selectedTemplates.includes(templateName)) {
         setSelectedTemplates(selectedTemplates.filter(name => name !== templateName));
     } else {
         setSelectedTemplates([...selectedTemplates, templateName])
     }
-    console.log("onTemplatesChange")
-    console.log(selectedTemplates)
   }
 
   return (
@@ -77,10 +93,10 @@ const SetEditModal = (props) => {
                 onChange={(e)=>setSetName(e.target.value)}
               />
             </Form.Group>
-            {!("templates" in currentCustomer) && <p>Zatím neexistuje žádný vzor</p> }
-            {("templates" in currentCustomer) && 
+            {!(existsTemplates(props.currentCustomer)) && <p>Zatím neexistuje žádný vzor</p> }
+            {(existsTemplates(props.currentCustomer)) && 
               <SelectTemplates
-                templatesList={currentCustomer.templates}
+                templatesList={props.currentCustomer.templates}
                 selectedTemplates={selectedTemplates}
                 onTemplatesClick={onTemplatesClick}
               />
@@ -92,7 +108,7 @@ const SetEditModal = (props) => {
             variant="secondary"
             size='sm'
             type='submit'
-            onClick={props.hideModal}>
+            onClick={onCancel}>
             Zruš změny
           </Button>{" "}
           <Button 

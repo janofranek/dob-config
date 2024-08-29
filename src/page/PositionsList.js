@@ -60,8 +60,8 @@ const PositionsList = (props) => {
         onClick={props.onNewClick}>
         Nová pozice
       </Button>
-      {!("positions" in templateDataFromParent) && <p>Zatím neexistuje žádná pozice</p>}
-      {("positions" in templateDataFromParent) &&
+      {!(typeof templateDataFromParent === "object" && "positions" in templateDataFromParent) && <p>Zatím neexistuje žádná pozice</p>}
+      {(typeof templateDataFromParent === "object" && "positions" in templateDataFromParent) &&
         <Table striped bordered hover size='sm'>
           <thead>
             <tr>

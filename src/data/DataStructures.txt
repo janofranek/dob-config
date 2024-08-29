@@ -1,8 +1,11 @@
 customers
+  id
   configuration
-    resultWidth
-    resultHeight
-    resultBackground
+    resultWidth - number
+    resultHeight - number
+    resultBackground - color (#rrggbb)
+  dictionaries
+    positions
   templates - array
     imageUrl
     templateName
@@ -19,3 +22,5 @@ customers
       templateName
 users
   id -> email
+  email
+  customerId

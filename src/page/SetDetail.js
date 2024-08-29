@@ -1,6 +1,5 @@
 import { React, useState, useEffect } from 'react';
 import "./Common.css"
-import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Button, Form } from "react-bootstrap";
 import DeleteConfirmation from './DeleteConfirmation';
 import { removeSet} from "../data/DataUtils"
@@ -11,23 +10,19 @@ const SetDetail = (props) => {
   const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(null);
   const [setDataFromParent, setSetDataFromParent] = useState({setName:"", setTemplates:[]})
-  const currentCustomer = useCurrentCustomer();
 
   useEffect(() => {
 
 
-    if (props.setIndex && currentCustomer) {
-      setSetDataFromParent(currentCustomer.sets[props.setIndex]);
+    if (props.setIndex && props.currentCustomer) {
+      setSetDataFromParent(props.currentCustomer.sets[props.setIndex]);
     } else {
       setSetDataFromParent({setName:"", setTemplates:[]});
     }
-  }, [props, currentCustomer])
-
-  // wait for data
-  if (!currentCustomer ) return "Loading...";
+  }, [props])
 
   const submitDelete = () => {
-    removeSet(currentCustomer.id, Number(props.setIndex))
+    removeSet(props.currentCustomer.id, Number(props.setIndex))
     setDisplayConfirmationModal(false);
   };
 
@@ -62,7 +57,7 @@ const SetDetail = (props) => {
         </Form.Group>
         <Form.Group>
           <SelectTemplates
-            templatesList={currentCustomer.templates}
+            templatesList={props.currentCustomer.templates}
             selectedTemplates={setDataFromParent.setTemplates}
             onTemplatesClick={onTemplatesClick}
           />
