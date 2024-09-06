@@ -1,25 +1,31 @@
 customers
   id
-  configuration
-    resultWidth - number
-    resultHeight - number
-    resultBackground - color (#rrggbb)
-  dictionaries
-    positions
+  X configuration
+    X resultWidth - number
+    X resultHeight - number
+    X resultBackground - color (#rrggbb)
+  X dictionaries
+  positions - array
+    positionName
+    width
+    height
   templates - array
     imageUrl
     templateName
-    negative
+    X negative
     positions - array
       positionName
       left
       top
       width
-      height
-  sets - array
-    setName
-    setTemplates - array
-      templateName
+      X height
+  designs - array
+    imageUrl
+    designName
+  X sets - array
+    X setName
+    X setTemplates - array
+      X templateName
 users
   id -> email
   email

@@ -284,7 +284,7 @@ const ConfigDictionariesPositions = (props) => {
   )
 }
 
-const Config = () => {
+const Positions = () => {
 
   //load data
   const authEmail = useAuth();
@@ -315,4 +315,4 @@ const Config = () => {
 
 }
 
-export default Config
+export default Positions

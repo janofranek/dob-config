@@ -53,9 +53,9 @@ const Layout = () => {
             <Nav className="me-auto">
               {authEmail &&
                   <>
-                  <Nav.Link as={Link} to="/config">Konfigurace</Nav.Link>
-                  <Nav.Link as={Link} to="/templates">Vzory</Nav.Link>
-                  <Nav.Link as={Link} to="/sets">Skupiny</Nav.Link>
+                  <Nav.Link as={Link} to="/positions">Obrázky</Nav.Link>
+                  <Nav.Link as={Link} to="/templates">Podklady</Nav.Link>
+                  <Nav.Link as={Link} to="/designs">Vzory</Nav.Link>
                   </>
               }
             </Nav>

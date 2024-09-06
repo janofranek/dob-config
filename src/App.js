@@ -3,9 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from './page/Layout';
 import Home from './page/Home';
 import LoginRegister from './page/LoginRegister';
-import Config from './page/Config';
+import Positions from './page/Positions';
 import Templates from './page/Templates';
-import Sets from './page/Sets';
+import Designs from './page/Designs';
 import NoPage from './page/NoPage';
 import { AuthProvider } from "./data/AuthProvider"
 import { UsersDataProvider } from "./data/UsersDataProvider"
@@ -19,9 +19,9 @@ function AppRouter() {
           <Route path="/" element={<Layout/>}>
             <Route index element={<Home/>} />
             <Route path="login" element={<LoginRegister/>} />
-            <Route path="config" element={<Config/>} />
+            <Route path="positions" element={<Positions/>} />
             <Route path="templates" element={<Templates/>} />
-            <Route path="sets" element={<Sets/>} />
+            <Route path="designs" element={<Designs/>} />
             <Route path="*" element={<NoPage/>} />
           </Route>
         </Routes>

@@ -22,7 +22,7 @@ const existsSet = (currentCustomer) => {
   }
 }
 
-const Sets = () => {
+const Designs = () => {
 
   const [setIndex, setSetIndex] = useState(null)
   const [displaySetEdit, setDisplaySetEdit] = useState(false);
@@ -103,4 +103,4 @@ const Sets = () => {
 
 }
 
-export default Sets
+export default Designs
