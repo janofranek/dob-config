@@ -5,7 +5,7 @@ import { Button, Table } from "react-bootstrap";
 import DeleteConfirmation from './DeleteConfirmation';
 import { removeTemplatePosition } from "../data/DataUtils"
 
-const PositionsList = (props) => {
+const TemplatePositions = (props) => {
   const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(null);
   const [templateDataFromParent, setTemplateDataFromParent] = useState({})
@@ -123,4 +123,4 @@ const PositionsList = (props) => {
   )
 }
 
-export default PositionsList
+export default TemplatePositions

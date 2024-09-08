@@ -3,6 +3,20 @@ import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Button, Table } from "react-bootstrap";
 
+const existsTemplate = (currentCustomer) => {
+  if (!(typeof currentCustomer === "object")) {
+    return false
+  } else if (!("templates" in currentCustomer)) {
+    return false
+  } else if (!Array.isArray(currentCustomer.templates)) {
+    return false
+  } else if (currentCustomer.templates.length === 0) {
+    return false
+  } else {
+    return true
+  }
+}
+
 const TemplatesList = (props) => {
 
   const currentCustomer = useCurrentCustomer();
@@ -16,15 +30,15 @@ const TemplatesList = (props) => {
         size='sm'
         type="submit"
         onClick={props.onNewClick}>
-        Nový vzor
+        Nový podklad
       </Button>
-      {!("templates" in currentCustomer) && <p>Zatím neexistuje žádný vzor</p> }
-      {("templates" in currentCustomer) && 
+      {!(existsTemplate(currentCustomer)) && <p>Zatím neexistuje žádný podklad</p> }
+      {(existsTemplate(currentCustomer)) && 
         <Table striped bordered hover size='sm'>
           <thead>
             <tr>
               <th>#</th>
-              <th>Název vzoru</th>
+              <th>Název podkladu</th>
             </tr>
           </thead>
           <tbody>

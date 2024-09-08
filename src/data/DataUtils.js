@@ -9,11 +9,6 @@ const getCurrentUser = (users, authEmail) => {
     }
 }
 
-const setConfiguration = async (customerId, newData) => {
-    const customerRef = doc(db, "customers", customerId);
-    await updateDoc(customerRef, { configuration: newData });
-}
-
 const addTemplate = async (customerId, newTemplate) => {
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
@@ -64,41 +59,56 @@ const addTemplatePosition = async (customerId, templateIndex, newPosition) => {
     }
 }
 
-const addDictionariesPosition = async (customerId, newPositionName, oldPositionName) => {
+const addPosition = async (customerId, newPosition, oldPositionName) => {
+
+    var result = {"result": false, "error": null}
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
 
     if (docSnap.exists()) {
         var newData = docSnap.data();
-        //if there is no dictionaries element - add it
-        if (!("dictionaries" in newData)) {
-            newData.dictionaries = {};
-        }
         //if there is no positions array - add it
-        if (!("positions" in newData.dictionaries)) {
-            newData.dictionaries.positions = [];
-        } 
-        //if already exists, there is nothing to do
-        if (newData.dictionaries.positions.find((pos) => pos === newPositionName)) {
-            return;
+        if (!("positions" in newData)) {
+            newData.positions = [];
         } 
         //if we have oldPositionName, it is update
         if (oldPositionName) {
-            const indexExists = newData.dictionaries.positions.findIndex((pos) => pos === oldPositionName)
+            const indexExists = newData.positions.findIndex((pos) => pos.positionName === oldPositionName);
             //but if oldPositionName is not there, there is nothing to update
             if (indexExists === -1) {
-                return;
+                result.error = `Could not find position to update - ${oldPositionName}`;
             }
-            newData.dictionaries.positions.splice(indexExists, 1, newPositionName);
-
+            //if oldPositionName is not the same as new one and new one exists, we have a unique key violation
+            else if (oldPositionName !== newPosition.positionName) {
+                const indexExistsNew = newData.positions.findIndex((pos) => pos.positionName === newPosition.positionName);
+                if (indexExistsNew !== -1) {
+                    result.error = `New position name already exists - ${newPosition.positionName}`;
+                }
+            }
+            //if all is peachy, replace old data
+            else {
+                newData.positions.splice(indexExists, 1, newPosition);
+            }
         } else {
-            //otherwise just add new position name
-            newData.dictionaries.positions.push(newPositionName);
+            //if new position name already exists, no no
+            const indexExistsNew = newData.positions.findIndex((pos) => pos.positionName === newPosition.positionName);
+            if (indexExistsNew !== -1) {
+                result.error = `New position name already exists - ${newPosition.positionName}`;
+            }
+            //otherwise just add new data
+            else { 
+                newData.positions.push(newPosition);
+            }
         }
-        await updateDoc(customerRef, newData);
+        //if the is no error, beam it up
+        if (!result.error) {
+            await updateDoc(customerRef, newData);
+            result.result = true;
+        }
     } else {
-        console.log("addDictionariesPosition - No such document!");
+        result.error = `Could not find data for current customer - ${customerId}`;
     }
+    return result;
 }
 
 const addSet = async (customerId, setIndex, newSet ) => {
@@ -185,30 +195,26 @@ const removeTemplatePosition = async (customerId, templateIndex, positionIndex) 
     }
 }
 
-const removeDictionariesPosition = async (customerId, deletePositionName) => {
+const removePosition = async (customerId, deletePositionName) => {
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
 
     if (docSnap.exists()) {
         var newData = docSnap.data();
-        // no dictionaries, nothing to do
-        if (!("dictionaries" in newData)) {
-            return;
-        }
         // no positions, nothing to do
-        if (!("positions" in newData.dictionaries)) {
+        if (!("positions" in newData)) {
             return;
         } 
-        const indexExists = newData.dictionaries.positions.findIndex((pos) => pos === deletePositionName)
+        const indexExists = newData.positions.findIndex((pos) => pos.positionName === deletePositionName)
         if (indexExists === -1) {
             return;
         }
 
-        newData.dictionaries.positions.splice(indexExists, 1);
+        newData.positions.splice(indexExists, 1);
         await updateDoc(customerRef, newData);
         
     } else {
-        console.log("removeDictionariesPosition - No such document!");
+        console.log("removePosition - No such document!");
     }
 }
 
@@ -230,13 +236,12 @@ const removeSet = async (customerId, setIndex) => {
 }
 
 export {    getCurrentUser, 
-            setConfiguration, 
             addTemplate, 
             removeTemplate, 
             addTemplatePosition, 
             removeTemplatePosition,
             addSet,
             removeSet,
-            addDictionariesPosition,
-            removeDictionariesPosition
+            addPosition,
+            removePosition
         }

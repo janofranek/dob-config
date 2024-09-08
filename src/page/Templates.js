@@ -5,9 +5,9 @@ import { useAuth } from '../data/AuthProvider';
 import { Container, Row, Col } from "react-bootstrap";
 import TemplatesList from "./TemplatesList"
 import TemplateDetail from "./TemplateDetail"
-import PositionsList from './PositionsList';
+import TemplatePositions from './TemplatePositions';
 import TemplateEditModal from './TemplateEditModal';
-import PositionEditModal from './PositionEditModal';
+import TemplatePositionEditModal from './TemplatePositionEditModal';
 
 
 const Templates = () => {
@@ -89,7 +89,7 @@ const Templates = () => {
             />
           </Col>
           <Col>
-            <PositionsList 
+            <TemplatePositions 
               templateIndex={templateIndex}
               onNewClick={onNewPositionClick}
               onEditClick={onEditPositionClick} 
@@ -104,7 +104,7 @@ const Templates = () => {
         templateIndex={templateIndex} 
         mode={modeTemplateEdit}
       />
-      <PositionEditModal 
+      <TemplatePositionEditModal 
         showModal={displayPositionEdit} 
         hideModal={hidePositionEdit} 
         imageProps={imageProps}
