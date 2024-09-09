@@ -24,10 +24,10 @@ const DeleteConfirmation = ({ showModal, hideModal, confirmModal, message }) => 
       <Modal.Body><div className="alert alert-danger">{message}</div></Modal.Body>
       <Modal.Footer>
         <Button variant="default" onClick={hideModal}>
-          Cancel
+          Nesmazat
         </Button>
         <Button variant="danger" disabled={isDeteleDisabled} onClick={onDelete}>
-          Delete
+          Smazat
         </Button>
       </Modal.Footer>
     </Modal>

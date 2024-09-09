@@ -8,7 +8,6 @@ import { addTemplate } from "../data/DataUtils"
 
 const TemplateEditModal = (props) => {
   const [templateName, setTemplateName] = useState("")
-  const [negative, setNegative] = useState(false)
   const [file, setFile] = useState(null)
   const [showProgress, setShowProgress] = useState(false);
   const [progresspercent, setProgresspercent] = useState(0);
@@ -19,11 +18,9 @@ const TemplateEditModal = (props) => {
   useEffect(() => {        
     if (props.mode === "new") {
       setTemplateName(null)
-      setNegative(false)
       setFile(null)
     } else if (props.mode === "edit" && currentCustomer) {
       setTemplateName(currentCustomer.templates[props.templateIndex].templateName)
-      setNegative(currentCustomer.templates[props.templateIndex].negative)
       setFile(null)
     }
   }, [props, currentCustomer]);
@@ -42,7 +39,6 @@ const TemplateEditModal = (props) => {
     const newTemplate = {
       "imageUrl": downloadURL,
       "templateName": templateName,
-      "negative": Boolean(negative)
     }
     addTemplate(currentCustomer.id, newTemplate);
   }
@@ -83,7 +79,6 @@ const TemplateEditModal = (props) => {
     //TODO better validation + unique template name
 
     setDisabledSave();
-
 
     if (!file && props.mode === "edit") {
       justSave();
@@ -127,16 +122,6 @@ const TemplateEditModal = (props) => {
                 required
                 onChange={(e)=>setTemplateName(e.target.value)}
               />
-            </Form.Group>
-            <Form.Group>
-              <Form.Check 
-                type="checkbox"
-                inline
-                id="negative"
-                checked={negative}
-                onChange={(e)=>setNegative(e.target.checked)}
-              />
-              <Form.Label className="col-form-label-sm">Použít negativ obrázku</Form.Label>
             </Form.Group>
           </Form>
         </Modal.Body>

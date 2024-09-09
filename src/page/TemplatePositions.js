@@ -31,7 +31,7 @@ const TemplatePositions = (props) => {
 
   const onPositionDelete = (e) => {
     e.preventDefault();
-    setDeleteMessage(`Opravdu chceš smazat pozici '${templateDataFromParent.positions[e.target.id].positionName}'?`);
+    setDeleteMessage(`Opravdu chceš smazat obrázek '${templateDataFromParent.positions[e.target.id].positionName}'?`);
     setPositionIndex(e.target.id)
     setDisplayConfirmationModal(true);
   }
@@ -58,7 +58,7 @@ const TemplatePositions = (props) => {
         size='sm'
         type="submit"
         onClick={props.onNewClick}>
-        Nová pozice
+        Nový obrázek
       </Button>
       {!(typeof templateDataFromParent === "object" && "positions" in templateDataFromParent) && <p>Zatím neexistuje žádná pozice</p>}
       {(typeof templateDataFromParent === "object" && "positions" in templateDataFromParent) &&
@@ -66,8 +66,8 @@ const TemplatePositions = (props) => {
           <thead>
             <tr>
               <th>#</th>
-              <th>Název pozice</th>
-              <th>Pozice (L/H/Š/V)</th>
+              <th>Obrázek</th>
+              <th>L/H/Š/V</th>
               <th></th>
             </tr>
           </thead>

@@ -69,7 +69,7 @@ const Canvas = (props) => {
       }));
     }
 
-    if ("width" in props.rectPosition && "width" in props.imgPosition) {
+    if (props.rectPosition && "width" in props.rectPosition && "width" in props.imgPosition) {
       const ratio_w = props.imgPosition.realWidth / props.imgPosition.naturalWidth;
       const ratio_h = props.imgPosition.realHeight / props.imgPosition.naturalHeight;
       const rectPositionNatural = {

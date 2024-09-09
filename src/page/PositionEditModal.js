@@ -1,25 +1,44 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import "./Common.css"
-import { Form, Button, Modal, Row, Col } from "react-bootstrap";
+import { Alert, Form, Button, Modal, Row, Col } from "react-bootstrap";
 import { addPosition } from '../data/DataUtils';
-import { InputNumber } from "./Utils"
+import { InputNumber, checkInteger } from "./Utils"
 
 const PositionEditModal = (props) => {
     const [positionName, setPositionName] = useState("")
-    const [arWidth, setARWidth] = useState(0)
-    const [arHeight, setARHeight] = useState(0)
+    const [arWidth, setARWidth] = useState(1)
+    const [arHeight, setARHeight] = useState(1)
     const [disabledSave, setDisabledSave] = useState(false);
-  
-    useEffect(() => {        
-      setPositionName(props.oldPositionName);
-    }, [props.oldPositionName]);
-  
-    const onSave = (e) => {
+    const [errorMsg, setErrorMsg] = useState("")
+
+    const initModal = () => {
+      if (props.oldPosition) {
+        setPositionName(props.oldPosition.positionName);
+        setARWidth(props.oldPosition.arWidth);
+        setARHeight(props.oldPosition.arHeight);
+      } else {
+        setPositionName("");
+        setARHeight(1);
+        setARWidth(1);
+      }
+    }
+
+
+
+    const onSave = async (e) => {
       e.preventDefault();
   
-      if (!positionName ) {
+      if (!positionName) {
+        setErrorMsg("Název obrázku nemůže být prázdný");
         return;
-        //TODO better validation 
+      }
+      if (!checkInteger(arWidth)) {
+        setErrorMsg("Šířka musí být kladné celé číslo");
+        return;
+      }
+      if (!checkInteger(arHeight)) {
+        setErrorMsg("Výška musí být kladné celé číslo");
+        return;
       }
   
       setDisabledSave();
@@ -28,25 +47,26 @@ const PositionEditModal = (props) => {
         "arWidth": arWidth,
         "arHeight": arHeight
       }
-      const result = addPosition(props.currentCustomer.id, newPosition, props.oldPositionName);
+      const result = await addPosition(props.currentCustomer.id, newPosition, props.oldPosition?.positionName);
       //TODO check errors
-      if (!result.result) {
-        console.log(`PositionEditModal - addPosition - ${result.error}`)
+      if (result.error) {
+        setErrorMsg(result.error);
+      } else {
+        props.hideModal();
+        setErrorMsg("");
       }
   
-      props.hideModal();
-      setPositionName(null);
     }
   
     const onCancel = (e) => {
       e.preventDefault();
       props.hideModal();
-      setPositionName(null);
+      setErrorMsg("");
     }
   
     return (
       <>        
-        <Modal show={props.showModal} onHide={props.hideModal} backdrop="static">
+        <Modal show={props.showModal} onHide={props.hideModal} onEnter={initModal} backdrop="static">
           <Modal.Body>
             <Form>
               <Form.Group>
@@ -67,10 +87,24 @@ const PositionEditModal = (props) => {
               </Form.Text>
               <Row>
                 <Col>
-                  <InputNumber labelName="Šířka" numberName="width" value={arWidth} onNumberChange={setARWidth}/>
+                  <InputNumber 
+                    labelName="Šířka" 
+                    numberName="arWidth" 
+                    value={arWidth} 
+                    min="1"
+                    max="10000"
+                    step="1"
+                    onNumberChange={setARWidth}/>
                 </Col>
                 <Col>
-                  <InputNumber labelName="Výška" numberName="height" value={arHeight} onNumberChange={setARHeight}/>
+                  <InputNumber 
+                    labelName="Výška" 
+                    numberName="arHeight" 
+                    value={arHeight} 
+                    min="1"
+                    max="10000"
+                    step="1"
+                    onNumberChange={setARHeight}/>
                 </Col>
               </Row>
             </Form>
@@ -90,7 +124,9 @@ const PositionEditModal = (props) => {
               onClick={onSave}>
               Ulož
             </Button>
+            
           </Modal.Footer>
+          {errorMsg && <Alert variant="danger" onClose={() => setErrorMsg("")} dismissible><p>{errorMsg}</p></Alert>}
         </Modal>
       </>
     )

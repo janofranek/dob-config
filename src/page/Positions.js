@@ -27,11 +27,11 @@ const Positions = () => {
   const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(null);
   const [positionName, setPositionName] = useState("");
-  const [oldPositionName, setOldPositionName] = useState("");
+  const [oldPosition, setOldPosition] = useState(null);
 
   const onPositionAdd = (e) => {
     e.preventDefault();
-    setOldPositionName(null);
+    setOldPosition(null);
     setDisplayPositionEdit(true);
   }
 
@@ -57,7 +57,7 @@ const Positions = () => {
 
   const onPositionUpdate = (e) => {
     e.preventDefault();
-    setOldPositionName(currentCustomer.positions[e.target.id]);
+    setOldPosition(currentCustomer.positions[e.target.id]);
     setDisplayPositionEdit(true);
   }
 
@@ -132,7 +132,7 @@ const Positions = () => {
         currentCustomer={currentCustomer}
         showModal={displayPositionEdit} 
         hideModal={hidePositionEdit} 
-        oldPositionName={oldPositionName}
+        oldPosition={oldPosition}
       />
       <DeleteConfirmation 
         showModal={displayConfirmationModal} 

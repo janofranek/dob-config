@@ -76,24 +76,24 @@ const addPosition = async (customerId, newPosition, oldPositionName) => {
             const indexExists = newData.positions.findIndex((pos) => pos.positionName === oldPositionName);
             //but if oldPositionName is not there, there is nothing to update
             if (indexExists === -1) {
-                result.error = `Could not find position to update - ${oldPositionName}`;
+                result.error = `Nenašel jsem obrázek - ${oldPositionName}`;
             }
             //if oldPositionName is not the same as new one and new one exists, we have a unique key violation
             else if (oldPositionName !== newPosition.positionName) {
                 const indexExistsNew = newData.positions.findIndex((pos) => pos.positionName === newPosition.positionName);
                 if (indexExistsNew !== -1) {
-                    result.error = `New position name already exists - ${newPosition.positionName}`;
+                    result.error = `Tento název obrázku je již obsazený - ${newPosition.positionName}`;
                 }
             }
             //if all is peachy, replace old data
-            else {
+            if (!result.error) {
                 newData.positions.splice(indexExists, 1, newPosition);
             }
         } else {
             //if new position name already exists, no no
             const indexExistsNew = newData.positions.findIndex((pos) => pos.positionName === newPosition.positionName);
             if (indexExistsNew !== -1) {
-                result.error = `New position name already exists - ${newPosition.positionName}`;
+                result.error = `Tento název obrázku je již obsazený - ${newPosition.positionName}`;
             }
             //otherwise just add new data
             else { 
@@ -102,11 +102,18 @@ const addPosition = async (customerId, newPosition, oldPositionName) => {
         }
         //if the is no error, beam it up
         if (!result.error) {
-            await updateDoc(customerRef, newData);
-            result.result = true;
+            try {
+                await updateDoc(customerRef, newData)
+            } catch(error) {
+                result.error = `Chyba při zápisu do databáze - ${error.message}`;
+            }
+            
         }
     } else {
-        result.error = `Could not find data for current customer - ${customerId}`;
+        result.error = `Nenašel jsem data zákazníka - ${customerId}`;
+    }
+    if (!result.error) {
+        result.result = true;
     }
     return result;
 }

@@ -1,10 +1,5 @@
 customers
   id
-  X configuration
-    X resultWidth - number
-    X resultHeight - number
-    X resultBackground - color (#rrggbb)
-  X dictionaries
   positions - array
     positionName
     width

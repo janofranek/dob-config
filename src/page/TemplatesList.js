@@ -1,7 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Button, Table } from "react-bootstrap";
+import DeleteConfirmation from './DeleteConfirmation';
+import { removeTemplate} from "../data/DataUtils"
 
 const existsTemplate = (currentCustomer) => {
   if (!(typeof currentCustomer === "object")) {
@@ -18,10 +20,33 @@ const existsTemplate = (currentCustomer) => {
 }
 
 const TemplatesList = (props) => {
+  const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState(null);
+  const [templateIndex, setTemplateIndex] = useState(null)
 
   const currentCustomer = useCurrentCustomer();
   //wait for data
   if (!currentCustomer ) return "Loading...";
+
+  const submitDelete = () => {
+    removeTemplate(currentCustomer.id, Number(templateIndex))
+    setDisplayConfirmationModal(false);
+  };
+
+  const hideConfirmationModal = () => {
+    setDisplayConfirmationModal(false);
+  };
+  const onTemplateDelete = (e) => {
+    e.preventDefault();
+    setDeleteMessage(`Opravdu chceš smazat podklad '${currentCustomer.templates[e.target.id].templateName}'?`);
+    setTemplateIndex(e.target.id)
+    setDisplayConfirmationModal(true);
+  }
+
+  const onTemplateEdit = (e) => {
+    e.preventDefault();
+    props.onEditClick(e);
+  }
 
   return ( 
     <>
@@ -34,25 +59,52 @@ const TemplatesList = (props) => {
       </Button>
       {!(existsTemplate(currentCustomer)) && <p>Zatím neexistuje žádný podklad</p> }
       {(existsTemplate(currentCustomer)) && 
-        <Table striped bordered hover size='sm'>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Název podkladu</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentCustomer.templates.map( (row, index) => {
-              return (
-                <tr key={index} onClick={props.onListClick}>
-                  <td id={index} >{index+1}</td>
-                  <td id={index} >{row.templateName}</td>
-                </tr>
-              )
+        <>
+          <Table striped bordered hover size='sm'>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Název podkladu</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentCustomer.templates.map( (row, index) => {
+                return (
+                  <tr key={index} onClick={props.onListClick}>
+                    <td id={index} >{index+1}</td>
+                    <td id={index} >{row.templateName}</td>
+                    <td>
+                      <Button
+                        variant="outline-danger"
+                        size='sm'
+                        type="submit"
+                        id={index}
+                        onClick={onTemplateDelete}>
+                        Smaž
+                      </Button>
+                      <Button
+                        variant="outline-primary"
+                        size='sm'
+                        type="submit"
+                        id={index}
+                        onClick={onTemplateEdit}>
+                        Uprav
+                      </Button>
+                    </td>
+                  </tr>
+                )
 
-            })}
-          </tbody>
-        </Table>
+              })}
+            </tbody>
+          </Table>
+          <DeleteConfirmation 
+            showModal={displayConfirmationModal} 
+            confirmModal={submitDelete} 
+            hideModal={hideConfirmationModal} 
+            message={deleteMessage}  
+          />
+        </>
       }
     </>
   )

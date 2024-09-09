@@ -78,9 +78,9 @@ const TemplatePositionEditModal = (props) => {
                 onChange={(e)=>setPositionName(e.target.value)}
               >
                 <option>Vyber pozici ze seznamu</option>
-                {currentCustomer.dictionaries.positions.map((row, index) => {
+                {currentCustomer.positions.map((row, index) => {
                   return (
-                    <option key={index} value={row}>{row}</option>
+                    <option key={index} value={row.positionName}>{row.positionName}</option>
                   )
                 })}
               </Form.Select>

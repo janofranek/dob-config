@@ -4,7 +4,7 @@ import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { Container, Row, Col } from "react-bootstrap";
 import TemplatesList from "./TemplatesList"
-import TemplateDetail from "./TemplateDetail"
+import TemplateImage from "./TemplateImage"
 import TemplatePositions from './TemplatePositions';
 import TemplateEditModal from './TemplateEditModal';
 import TemplatePositionEditModal from './TemplatePositionEditModal';
@@ -78,14 +78,14 @@ const Templates = () => {
             <TemplatesList 
               onListClick={onTemplateListClick} 
               onNewClick={onNewTemplateClick}
+              onEditClick={onEditTemplateClick}
             />
           </Col>
           <Col>
-            <TemplateDetail 
+            <TemplateImage 
               templateIndex={templateIndex} 
               setImageProps={setImageProps}
               showPositionRect={showPositionRect}
-              onEditClick={onEditTemplateClick}
             />
           </Col>
           <Col>

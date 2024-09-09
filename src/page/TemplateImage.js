@@ -1,11 +1,11 @@
 import React, {useEffect, useState, useRef} from 'react';
 import "./Common.css"
+import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Image } from "react-bootstrap";
 import Canvas from './Canvas';
 
 
-const ProductImage = (props) => {
-
+const TemplateImage = (props) => {
   const imageRef = useRef(null);
   const imageObj = imageRef.current;
 
@@ -13,21 +13,30 @@ const ProductImage = (props) => {
   const [imgPosition, setImagePosition] = useState({}) 
   const [rectPosition, setRectPosition] = useState({}) 
 
-  useEffect(() => {        
+  const currentCustomer = useCurrentCustomer();
 
-    if (!props.imgUrl) {
+  useEffect(() => {
+    var imageUrlTemp = null
+    if (props.templateIndex && currentCustomer) {
+      imageUrlTemp = currentCustomer.templates[props.templateIndex].imageUrl
+    }
+
+    if (!imageUrlTemp) {
       setImageUrl("empty.png");
     } else {
-      setImageUrl(props.imgUrl);
+      setImageUrl(imageUrlTemp);
     }
 
-    if (!props.positionRect) {
+    if (!props.showPositionRect) {
       setRectPosition({ left: 100, top: 100, width: 100, height: 100 });
     } else {
-      setRectPosition(props.positionRect);
+      setRectPosition(props.showPositionRect);
     }
 
-  }, [props]);
+  }, [props, currentCustomer])
+
+  //wait for data
+  if (!currentCustomer ) return "Loading...";
 
   const getImagePosition = (img) => {
     const newPosition = {};
@@ -63,7 +72,6 @@ const ProductImage = (props) => {
   };
 
   return (
-
     <div className="outsideWrapper">
       <div className="insideWrapper">
         <Image
@@ -79,4 +87,5 @@ const ProductImage = (props) => {
   )
 }
 
-export default ProductImage
+export default TemplateImage
+  
