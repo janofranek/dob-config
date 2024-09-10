@@ -26,7 +26,7 @@ const Positions = () => {
   const [displayPositionEdit, setDisplayPositionEdit] = useState(false);
   const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(null);
-  const [positionName, setPositionName] = useState("");
+  const [deletePositionName, setDeletePositionName] = useState("");
   const [oldPosition, setOldPosition] = useState(null);
 
   const onPositionAdd = (e) => {
@@ -40,7 +40,7 @@ const Positions = () => {
   };
 
   const submitDelete = () => {
-    removePosition(currentCustomer.id, positionName)
+    removePosition(currentCustomer.id, deletePositionName)
     setDisplayConfirmationModal(false);
   };
 
@@ -50,8 +50,8 @@ const Positions = () => {
 
   const onPositionDelete = (e) => {
     e.preventDefault();
+    setDeletePositionName(currentCustomer.positions[e.target.id].positionName);
     setDeleteMessage(`Opravdu chceš smazat obrázek '${currentCustomer.positions[e.target.id].positionName}'?`);
-    setPositionName(currentCustomer.positions[e.target.id].positionName);
     setDisplayConfirmationModal(true);
   }
 
@@ -60,7 +60,6 @@ const Positions = () => {
     setOldPosition(currentCustomer.positions[e.target.id]);
     setDisplayPositionEdit(true);
   }
-
 
   //load data
   const authEmail = useAuth();

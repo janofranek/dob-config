@@ -1,32 +1,34 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
-import { Button, Form, ProgressBar, Modal } from "react-bootstrap";
-import { storage } from '../cred/firebase';
-import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { Button, Form, ProgressBar, Modal, Alert } from "react-bootstrap";
 import { addTemplate } from "../data/DataUtils"
+import { uploadFile } from "../data/FileUtils"
 
 const TemplateEditModal = (props) => {
   const [templateName, setTemplateName] = useState("")
   const [file, setFile] = useState(null)
-  const [showProgress, setShowProgress] = useState(false);
-  const [progresspercent, setProgresspercent] = useState(0);
-  const [disabledSave, setDisabledSave] = useState(false);
+  const [showProgress, setShowProgress] = useState(false)
+  const [progresspercent, setProgresspercent] = useState(0)
+  const [disabledSave, setDisabledSave] = useState(false)
+  const [errorMsg, setErrorMsg] = useState("")
 
-  const currentCustomer = useCurrentCustomer();
-
-  useEffect(() => {        
-    if (props.mode === "new") {
-      setTemplateName(null)
-      setFile(null)
-    } else if (props.mode === "edit" && currentCustomer) {
-      setTemplateName(currentCustomer.templates[props.templateIndex].templateName)
-      setFile(null)
-    }
-  }, [props, currentCustomer]);
+  const currentCustomer = useCurrentCustomer()
 
   //wait for data
-  if (!currentCustomer ) return "Loading...";
+  if (!currentCustomer ) return "Loading..."
+
+  const showProgressBar = (show) => {
+    setShowProgress(show)
+  }
+
+  const showProgressPercent = (percent) => {
+    setProgresspercent(percent)
+  }
+
+  const setErrorMessage = (msg) => {
+    setErrorMsg(msg)
+  }
 
   const onFileChange = (e) => {
     const files = e.target.files
@@ -35,67 +37,80 @@ const TemplateEditModal = (props) => {
     setFile(files[0])
   }
 
+  const initModal = () => {
+    if (props.oldTemplate) {
+      setTemplateName(props.oldTemplate.templateName);
+    } else {
+      setTemplateName("");
+    }
+    setFile(null)
+  }
+
   const saveTemplate = (downloadURL) => {
     const newTemplate = {
       "imageUrl": downloadURL,
       "templateName": templateName,
     }
-    addTemplate(currentCustomer.id, newTemplate);
+    return addTemplate(currentCustomer.id, newTemplate);
   }
 
   const justSave = () => {
-    saveTemplate(currentCustomer.templates[props.templateIndex].imageUrl);
-    props.hideModal();
+    console.log("justSave")
+    return saveTemplate(currentCustomer.templates[props.templateIndex].imageUrl)
   }
 
+  
   const uploadAndSave = (fileLocation) => {
-    setShowProgress(true)
 
-    const storageRef = ref(storage, fileLocation);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    
-      uploadTask.on("state_changed",
-        (snapshot) => {
-          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          setProgresspercent(progress);
-        },
-        (error) => {
-          alert(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            saveTemplate(downloadURL);
-            setShowProgress(false);
-            props.hideModal()
-          });
-        }
-      );
+    uploadFile(fileLocation, file, showProgressBar, showProgressPercent, saveTemplate, setErrorMessage)
+
   }
 
   const onSave = (e) => {
+    var result = {}
+    console.log("onSave")
+
     e.preventDefault();
 
-    if (( !file && props.mode === "new" ) || !templateName) return;
-    //TODO better validation + unique template name
+    if (!templateName) {
+      setErrorMsg("Název podkladu nemůže být prázdný")
+      return
+    }
+
+    if (( !file && props.mode === "new" )) {
+      setErrorMsg("Je potřeba vybrat nějaký soubor s fotkou podkladu")
+      return
+    }
 
     setDisabledSave();
-
+  
     if (!file && props.mode === "edit") {
-      justSave();
+      result = justSave()
     } else if (file) {
-      const fileLocation = `${currentCustomer.id}/${templateName}_${file.name}`;
-      uploadAndSave(fileLocation);
-      //TODO check and report errors
+      console.log("uploadAndSave")
+      const fileLocation = `${currentCustomer.id}/templates/${templateName}_${file.name}`;
+      result = uploadAndSave(fileLocation);
+      console.log(result)
+    }
+    console.log("onSave - finish")
+    console.log(errorMsg)
+    if (!errorMsg) {
+      props.hideModal();
     }
 
   }
 
+  const onCancel = (e) => {
+    e.preventDefault();
+    props.hideModal()
+    setErrorMsg("");
+  }
+
   return (
     <>        
-      <Modal show={props.showModal} onHide={props.hideModal} backdrop="static">
+      <Modal show={props.showModal} onHide={props.hideModal} onEnter={initModal} backdrop="static">
         <Modal.Body>
-
-          { showProgress && <ProgressBar stripped variant="info" now={progresspercent} />}
+          { showProgress && <ProgressBar stripped="true" variant="info" now={progresspercent} />}
           <Form>
             <Form.Group>
               <Form.Label className="col-form-label-sm">Soubor se vzorem</Form.Label>
@@ -129,18 +144,19 @@ const TemplateEditModal = (props) => {
           <Button 
             variant="secondary"
             size='sm'
-            type='submit'
-            onClick={props.hideModal}>
+            onClick={onCancel}>
             Zrušit změny
           </Button>{" "}
           <Button 
             variant="primary"
+            type='submit'
             size='sm'
             disabled={disabledSave}
             onClick={onSave}>
             Uložit
           </Button>
         </Modal.Footer>
+        {errorMsg && <Alert variant="danger" onClose={() => setErrorMsg("")} dismissible><p>{errorMsg}</p></Alert>}
       </Modal>
     </>
   )

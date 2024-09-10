@@ -23,8 +23,6 @@ const PositionEditModal = (props) => {
       }
     }
 
-
-
     const onSave = async (e) => {
       e.preventDefault();
   
@@ -48,7 +46,6 @@ const PositionEditModal = (props) => {
         "arHeight": arHeight
       }
       const result = await addPosition(props.currentCustomer.id, newPosition, props.oldPosition?.positionName);
-      //TODO check errors
       if (result.error) {
         setErrorMsg(result.error);
       } else {

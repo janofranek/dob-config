@@ -22,14 +22,15 @@ const existsTemplate = (currentCustomer) => {
 const TemplatesList = (props) => {
   const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(null);
-  const [templateIndex, setTemplateIndex] = useState(null)
+  const [deleteTemplateName, setDeleteTemplateName] = useState("");
 
   const currentCustomer = useCurrentCustomer();
   //wait for data
   if (!currentCustomer ) return "Loading...";
 
   const submitDelete = () => {
-    removeTemplate(currentCustomer.id, Number(templateIndex))
+    removeTemplate(currentCustomer.id, deleteTemplateName)
+    props.resetList()
     setDisplayConfirmationModal(false);
   };
 
@@ -38,8 +39,8 @@ const TemplatesList = (props) => {
   };
   const onTemplateDelete = (e) => {
     e.preventDefault();
+    setDeleteTemplateName(currentCustomer.templates[e.target.id].templateName)
     setDeleteMessage(`Opravdu chceš smazat podklad '${currentCustomer.templates[e.target.id].templateName}'?`);
-    setTemplateIndex(e.target.id)
     setDisplayConfirmationModal(true);
   }
 

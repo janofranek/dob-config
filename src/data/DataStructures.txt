@@ -7,7 +7,6 @@ customers
   templates - array
     imageUrl
     templateName
-    X negative
     positions - array
       positionName
       left
@@ -17,10 +16,6 @@ customers
   designs - array
     imageUrl
     designName
-  X sets - array
-    X setName
-    X setTemplates - array
-      X templateName
 users
   id -> email
   email

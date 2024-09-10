@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
-import { Button, Form, Modal, Row, Col } from "react-bootstrap";
+import { Button, Form, Modal, Row, Col, Alert } from "react-bootstrap";
 import { addTemplatePosition } from "../data/DataUtils" 
-import { InputNumber } from "./Utils"
+import { InputNumber, checkInteger } from "./Utils"
 
 const TemplatePositionEditModal = (props) => {
   const [positionName, setPositionName] = useState("")
@@ -12,38 +12,51 @@ const TemplatePositionEditModal = (props) => {
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
   const [disabledSave, setDisabledSave] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("")
 
   const currentCustomer = useCurrentCustomer();
 
-  useEffect(() => {        
-    if (props.mode === "new") {
+  //wait for data
+  if (!currentCustomer ) return "Loading...";
+
+  const initModal = () => {
+    if (props.oldTemplatePosition) {
+      setPositionName(props.oldTemplatePosition.positionName)
+      setLeft(props.oldTemplatePosition.left)
+      setTop(props.oldTemplatePosition.top)
+      setWidth(props.oldTemplatePosition.width)
+      setHeight(props.oldTemplatePosition.height)
+    } else {
       setPositionName("")
       setLeft(0)
       setTop(0)
       setWidth(0)
       setHeight(0)
-    } else if (props.mode === "edit" && currentCustomer) {
-      const position = currentCustomer.templates[props.templateIndex].positions[props.positionIndex]
-      setPositionName(position.positionName)
-      setLeft(position.left)
-      setTop(position.top)
-      setWidth(position.width)
-      setHeight(position.height)
-      console.log(position.positionName)
     }
-  }, [props, currentCustomer]);
+  }
 
-  //wait for data
-  if (!currentCustomer ) return "Loading...";
-
-  const onSave = (e) => {
+  const onSave = async (e) => {
     e.preventDefault();
-    console.log("onSave - position")
 
-    if (!positionName || !left || !top || !width || !height) {
-      console.log("onSave - position - error")
+    if (!positionName) {
+      setErrorMsg("Název obrázku nemůže být prázdný");
       return;
-      //TODO better validation + unique position name
+    }
+    if (!checkInteger(left)) {
+      setErrorMsg("Zleva musí být kladné celé číslo");
+      return;
+    }
+    if (!checkInteger(top)) {
+      setErrorMsg("Zprava musí být kladné celé číslo");
+      return;
+    }
+    if (!checkInteger(width)) {
+      setErrorMsg("Šířka musí být kladné celé číslo");
+      return;
+    }
+    if (!checkInteger(height)) {
+      setErrorMsg("Výška musí být kladné celé číslo");
+      return;
     }
 
     setDisabledSave();
@@ -54,15 +67,20 @@ const TemplatePositionEditModal = (props) => {
       "width": width,
       "height": height
     }
-    addTemplatePosition(currentCustomer.id, Number(props.templateIndex), newPosition)
-    //TODO check errors
 
-    props.hideModal()
+    const result = await addTemplatePosition(currentCustomer.id, Number(props.templateIndex), newPosition, props.oldTemplatePosition?.positionName);
+    if (result.error) {
+      setErrorMsg(result.error);
+    } else {
+      props.hideModal();
+      setErrorMsg("");
+    }
+
   }
 
   return (
     <>        
-      <Modal show={props.showModal} onHide={props.hideModal} backdrop="static">
+      <Modal show={props.showModal} onHide={props.hideModal} onEnter={initModal} backdrop="static">
         <Modal.Body>
           <Form>
             <Form.Group>
@@ -122,6 +140,7 @@ const TemplatePositionEditModal = (props) => {
             Uložit
           </Button>
         </Modal.Footer>
+        {errorMsg && <Alert variant="danger" onClose={() => setErrorMsg("")} dismissible><p>{errorMsg}</p></Alert>}
       </Modal>
     </>
   )

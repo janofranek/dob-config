@@ -40,16 +40,11 @@ const Home = () => {
               <Card.Body>
                 <Card.Title>TODO - GUI konfigurace</Card.Title>
                 <ListGroup variant='flush'>
-                  <ListGroup.Item><s>Editace skupiny - změna názvu přidá novou skupinu</s></ListGroup.Item>
-                  <ListGroup.Item><s>Editace pozice - zadáním souřadnic</s> - změna názvu pozice přidá novou pozici</ListGroup.Item>
-                  <ListGroup.Item>Editace pozice - graficky</ListGroup.Item>
-                  <ListGroup.Item><s>Editace vzoru</s> - změna názvu přidá nový vzor</ListGroup.Item>
-                  <ListGroup.Item>Při změně fotky u vzoru smazat starou fotku</ListGroup.Item>
-                  <ListGroup.Item><s>Správa slovníků (zatím jen seznam názvů pozic)</s></ListGroup.Item>
-                  <ListGroup.Item>Pořádné validace vstupů</ListGroup.Item>
-                  <ListGroup.Item><s>Unikátní názvy vzorů, pozic, skupin</s></ListGroup.Item>
-                  <ListGroup.Item>Mazání vzorů - smazat i fotku a projít skupiny</ListGroup.Item>
-                  <ListGroup.Item>Hlášení chyb - alerty</ListGroup.Item>
+                  <ListGroup.Item>Při smazání podkladu přesunout fokus na první řádek</ListGroup.Item>
+                  <ListGroup.Item>Vzory - nahrát fotku</ListGroup.Item>
+                  <ListGroup.Item>Při změně fotky u podkladu nebo vzoru smazat starou fotku</ListGroup.Item>
+                  <ListGroup.Item>Mazání podkladů a vzorů - smazat i fotku</ListGroup.Item>
+                  <ListGroup.Item>Editace obrázku na podkladu - graficky</ListGroup.Item>
                 </ListGroup>
               </Card.Body>
             </Card>
@@ -59,10 +54,18 @@ const Home = () => {
               <Card.Body>
                 <Card.Title>TODO - API</Card.Title>
                 <ListGroup variant='flush'>
-                  <ListGroup.Item><s>Napojení na konfiguraci v databázi</s></ListGroup.Item>
-                  <ListGroup.Item>Více obrázků najednou</ListGroup.Item>
-                  <ListGroup.Item>Skupiny</ListGroup.Item>
+                  <ListGroup.Item>Upravit - podklady i obrázky z databáze</ListGroup.Item>
                   <ListGroup.Item>Export konfigurace ?</ListGroup.Item>
+                </ListGroup>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col>
+            <Card>
+              <Card.Body>
+                <Card.Title>TODO - CLI</Card.Title>
+                <ListGroup variant='flush'>
+                  <ListGroup.Item>CLI pro API</ListGroup.Item>
                 </ListGroup>
               </Card.Body>
             </Card>

@@ -4,18 +4,18 @@ import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Container, Button, Row, Col } from 'react-bootstrap';
-import SetDetail from './SetDetail';
-import SetsList from './SetsList';
-import SetEditModal from './SetEditModal';
+import DesignDetail from './DesignDetail';
+import DesignsList from './DesignsList';
+import DesignEditModal from './DesignEditModal';
 
-const existsSet = (currentCustomer) => {
+const existsDesign = (currentCustomer) => {
   if (!(typeof currentCustomer === "object")) {
     return false
-  } else if (!("sets" in currentCustomer)) {
+  } else if (!("designs" in currentCustomer)) {
     return false
-  } else if (!Array.isArray(currentCustomer.sets)) {
+  } else if (!Array.isArray(currentCustomer.designs)) {
     return false
-  } else if (currentCustomer.sets.length === 0) {
+  } else if (currentCustomer.designs.length === 0) {
     return false
   } else {
     return true
@@ -24,32 +24,30 @@ const existsSet = (currentCustomer) => {
 
 const Designs = () => {
 
-  const [setIndex, setSetIndex] = useState(null)
-  const [displaySetEdit, setDisplaySetEdit] = useState(false);
-  const [modalMode, setModalMode] = useState("new")
+  const [designIndex, setDesignIndex] = useState(null)
+  const [displayDesignEdit, setDisplayDesignEdit] = useState(false);
+  const [oldDesign, setOldDesign] = useState(null);
 
-  const onSetsListClick = (e) => {
+  const onDesignsListClick = (e) => {
     e.preventDefault();
-    setSetIndex(e.target.id);
+    setDesignIndex(e.target.id);
   }
 
-  const onNewSetClick = (e) => {
+  const onNewDesignClick = (e) => {
     e.preventDefault();
-    setModalMode("new");
-    setSetIndex(null)
-    setDisplaySetEdit(true);
+    setOldDesign(null)
+    setDisplayDesignEdit(true);
   }
 
-  const onEditSetClick = (e) => {
+  const onEditDesignClick = (e) => {
     e.preventDefault();
-    setModalMode("edit");
-    setDisplaySetEdit(true);
+    setOldDesign(currentCustomer.designs[e.target.id]);
+    setDisplayDesignEdit(true);
   }
 
-  const hideSetEdit = () => {
-    setDisplaySetEdit(false);
+  const hideDesignEdit = () => {
+    setDisplayDesignEdit(false);
   };
-
 
   //load data
   const authEmail = useAuth();
@@ -65,38 +63,39 @@ const Designs = () => {
 
   return (
     <>
-      {!(existsSet(currentCustomer)) && <p>Zatím neexistuje žádná skupina</p> }
-      {(existsSet(currentCustomer)) && 
+      <Button
+        variant="primary"
+        size='sm'
+        type="submit"
+        onClick={onNewDesignClick}>
+        Nový vzor
+      </Button>
+      {!(existsDesign(currentCustomer)) && <p>Zatím neexistuje žádný vzor</p> }
+      {(existsDesign(currentCustomer)) && 
         <Container>
           <Row>
             <Col md="auto">
-              <SetsList 
+              <DesignsList 
                 currentCustomer={currentCustomer}
-                onListClick={onSetsListClick}         />
+                onListClick={onDesignsListClick}         
+                onEditClick={onEditDesignClick}
+              />
             </Col>
             <Col md="auto">
-              <SetDetail 
+              <DesignDetail 
                 currentCustomer={currentCustomer}
-                setIndex={setIndex} 
-                onEditClick={onEditSetClick}
+                designIndex={designIndex} 
+                onEditClick={onEditDesignClick}
               />
             </Col>
           </Row>
         </Container>
       }
-      <Button
-        variant="primary"
-        size='sm'
-        type="submit"
-        onClick={onNewSetClick}>
-        Nová skupina
-      </Button>
-      <SetEditModal 
+      <DesignEditModal 
         currentCustomer={currentCustomer}
-        showModal={displaySetEdit} 
-        hideModal={hideSetEdit} 
-        mode={modalMode}
-        setIndex={setIndex}
+        showModal={displayDesignEdit} 
+        hideModal={hideDesignEdit} 
+        oldDesign={oldDesign}
       />
     </>
   )

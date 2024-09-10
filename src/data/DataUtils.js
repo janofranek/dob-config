@@ -9,57 +9,7 @@ const getCurrentUser = (users, authEmail) => {
     }
 }
 
-const addTemplate = async (customerId, newTemplate) => {
-    const customerRef = doc(db, "customers", customerId);
-    const docSnap = await getDoc(customerRef);
-
-    if (docSnap.exists()) {
-        var newData = docSnap.data();
-        if (!("templates" in newData)) {
-            newData["templates"] = [];
-        }
-        //if exists edit, otherwise add
-        const indexExists = newData.templates.findIndex((template) => template.templateName === newTemplate.templateName)
-        if (indexExists === -1) {
-            newData.templates.push(newTemplate);
-        } else {
-            newData.templates[indexExists] = newTemplate;
-        }
-        await updateDoc(customerRef, newData);
-    } else {
-      console.log("addTemplate - No such document!");
-    }
-}
-
-const addTemplatePosition = async (customerId, templateIndex, newPosition) => {
-    const customerRef = doc(db, "customers", customerId);
-    const docSnap = await getDoc(customerRef);
-
-    if (docSnap.exists()) {
-        var newData = docSnap.data();
-        if (!("templates" in newData)) {
-            console.log("addTemplatePosition - No templates in document!");
-        } else if (newData.templates.length < templateIndex + 1) {
-            console.log("addTemplatePosition - No template on given index!");
-        } else {
-            if (!("positions" in newData.templates[templateIndex])) {
-            newData.templates[templateIndex]["positions"] = [];
-            }
-            //if exists edit, otherwise add
-            const indexExists = newData.templates[templateIndex].positions.findIndex((pos) => pos.positionName === newPosition.positionName)
-            if (indexExists === -1) {
-                newData.templates[templateIndex].positions.push(newPosition)
-            } else {
-                newData.templates[templateIndex].positions[indexExists] = newPosition
-            }
-            await updateDoc(customerRef, newData)
-        }
-    } else {
-        console.log("addTemplatePosition - No such document!");
-    }
-}
-
-const addPosition = async (customerId, newPosition, oldPositionName) => {
+const addTemplatePosition = async (customerId, templateIndex, newTemplatePosition, oldTemplatePositionName) => {
 
     var result = {"result": false, "error": null}
     const customerRef = doc(db, "customers", customerId);
@@ -67,40 +17,105 @@ const addPosition = async (customerId, newPosition, oldPositionName) => {
 
     if (docSnap.exists()) {
         var newData = docSnap.data();
-        //if there is no positions array - add it
-        if (!("positions" in newData)) {
-            newData.positions = [];
-        } 
-        //if we have oldPositionName, it is update
-        if (oldPositionName) {
-            const indexExists = newData.positions.findIndex((pos) => pos.positionName === oldPositionName);
-            //but if oldPositionName is not there, there is nothing to update
-            if (indexExists === -1) {
-                result.error = `Nenašel jsem obrázek - ${oldPositionName}`;
+        if (!("templates" in newData)) {
+            result.error = `Problém - nenašel jsem žádné podklady`
+        } else if (newData.templates.length < templateIndex + 1) {
+            result.error = `Problém - nenašel jsem správný podklady`
+        } else {
+            if (!("positions" in newData.templates[templateIndex])) {
+                newData.templates[templateIndex]["positions"] = [];
             }
-            //if oldPositionName is not the same as new one and new one exists, we have a unique key violation
-            else if (oldPositionName !== newPosition.positionName) {
-                const indexExistsNew = newData.positions.findIndex((pos) => pos.positionName === newPosition.positionName);
+            //if we have oldTemplatePositionName, it is update
+            if (oldTemplatePositionName) {
+                const indexExists = newData.templates[templateIndex].positions.findIndex((pos) => pos.positionName === oldTemplatePositionName);
+                //but if oldTemplatePositionName is not there, there is nothing to update
+                if (indexExists === -1) {
+                    result.error = `Nenašel jsem obrázek - ${oldTemplatePositionName}`;
+                }
+                //if oldTemplatePositionName is not the same as new one and new one exists, we have a unique key violation
+                else if (oldTemplatePositionName !== newTemplatePosition.positionName) {
+                    const indexExistsNew = newData.templates[templateIndex].positions.findIndex((pos) => pos.positionName === newTemplatePosition.positionName);
+                    if (indexExistsNew !== -1) {
+                        result.error = `Tento název je již obsazený - ${newTemplatePosition.positionName}`;
+                    }
+                }
+                //if all is peachy, replace old data
+                if (!result.error) {
+                    newData.templates[templateIndex].positions.splice(indexExists, 1, newTemplatePosition);
+                }
+            } else {
+                //if new object name already exists, no no
+                const indexExistsNew = newData.templates[templateIndex].positions.findIndex((pos) => pos.positionName === newTemplatePosition.positionName);
                 if (indexExistsNew !== -1) {
-                    result.error = `Tento název obrázku je již obsazený - ${newPosition.positionName}`;
+                    result.error = `Tento název je již obsazený - ${newTemplatePosition.positionName}`;
+                }
+                //otherwise just add new data
+                else { 
+                    newData.templates[templateIndex].positions.push(newTemplatePosition);
+                }
+            }
+            //if there is no error, beam it up
+            if (!result.error) {
+                try {
+                    await updateDoc(customerRef, newData)
+                } catch(error) {
+                    result.error = `Chyba při zápisu do databáze - ${error.message}`;
+                }
+                
+            }
+        }
+    } else {
+        result.error = `Nenašel jsem data zákazníka - ${customerId}`;
+    }
+    if (!result.error) {
+        result.result = true;
+    }
+    return result;
+
+}
+
+const addCustomerConfig = async (customerId, datasetName, newObject, nameFieldName, oldObjectName) => {
+
+    var result = {"result": false, "error": null}
+    const customerRef = doc(db, "customers", customerId);
+    const docSnap = await getDoc(customerRef);
+
+    if (docSnap.exists()) {
+        var newData = docSnap.data();
+        //if there is no datase array - add it
+        if (!(datasetName in newData)) {
+            newData[datasetName] = [];
+        } 
+        //if we have oldObjectName, it is update
+        if (oldObjectName) {
+            const indexExists = newData[datasetName].findIndex((pos) => pos[nameFieldName] === oldObjectName);
+            //but if oldObjectName is not there, there is nothing to update
+            if (indexExists === -1) {
+                result.error = `Nenašel jsem objekt - ${oldObjectName}`;
+            }
+            //if oldObjectName is not the same as new one and new one exists, we have a unique key violation
+            else if (oldObjectName !== newObject[nameFieldName]) {
+                const indexExistsNew = newData[datasetName].findIndex((pos) => pos[nameFieldName] === newObject[nameFieldName]);
+                if (indexExistsNew !== -1) {
+                    result.error = `Tento název je již obsazený - ${newObject[nameFieldName]}`;
                 }
             }
             //if all is peachy, replace old data
             if (!result.error) {
-                newData.positions.splice(indexExists, 1, newPosition);
+                newData[datasetName].splice(indexExists, 1, newObject);
             }
         } else {
-            //if new position name already exists, no no
-            const indexExistsNew = newData.positions.findIndex((pos) => pos.positionName === newPosition.positionName);
+            //if new object name already exists, no no
+            const indexExistsNew = newData[datasetName].findIndex((pos) => pos[nameFieldName] === newObject[nameFieldName]);
             if (indexExistsNew !== -1) {
-                result.error = `Tento název obrázku je již obsazený - ${newPosition.positionName}`;
+                result.error = `Tento název je již obsazený - ${newObject[nameFieldName]}`;
             }
             //otherwise just add new data
             else { 
-                newData.positions.push(newPosition);
+                newData[datasetName].push(newObject);
             }
         }
-        //if the is no error, beam it up
+        //if there is no error, beam it up
         if (!result.error) {
             try {
                 await updateDoc(customerRef, newData)
@@ -118,65 +133,59 @@ const addPosition = async (customerId, newPosition, oldPositionName) => {
     return result;
 }
 
-const addSet = async (customerId, setIndex, newSet ) => {
+const removeCustomerConfig = async (customerId, datasetName, nameFieldName, deleteObjectName) => {
     const customerRef = doc(db, "customers", customerId);
     const docSnap = await getDoc(customerRef);
-    const indexNum = Number(setIndex);
 
     if (docSnap.exists()) {
         var newData = docSnap.data();
-        //if there is not sets element - add it
-        if (!("sets" in newData)) {
-            newData["sets"] = [];
+        // no dataset, nothing to do
+        if (!(datasetName in newData)) {
+            return;
+        } 
+        const indexExists = newData[datasetName].findIndex((pos) => pos[nameFieldName] === deleteObjectName)
+        if (indexExists === -1) {
+            return;
         }
-        //if there is set index, it is edit
-        if (indexNum >= 0) {
-            //but if it does not exists, there is nothing to do
-            if (newData.sets.length < indexNum + 1) {
-                console.log("addSet - given index does not exists");
-                return;
-            }
-            //and if there already is new set name used, there is nothing to do
-            const indexExists = newData.sets.findIndex((set) => set.setName === newSet.setName)
-            if (indexExists > -1 && !(indexExists === indexNum)) {
-                console.log("addSet - given set name already exists");
-                return;
-            }
-            //otherwise edit
-            newData.sets[indexNum] = newSet;
-            await updateDoc(customerRef, newData)
-        } else {
-            //with no index it is addition
-            //but if the set name is already in use, there will be no action
-            const indexExists2 = newData.sets.findIndex((set) => set.setName === newSet.setName)
-            if (indexExists2 > -1) {
-                console.log("addSet - given set name already exists");
-                return;
-            }
-            //otherwise add
-            newData.sets.push(newSet);
-            await updateDoc(customerRef, newData);
-        }
+
+        newData[datasetName].splice(indexExists, 1);
+        await updateDoc(customerRef, newData);
+        
     } else {
-      console.log("addSet - No such document!");
+        console.log(`Nenašel jsem data zákazníka - ${customerId}`);
     }
 }
 
-const removeTemplate = async (customerId, templateIndex) => {
-    const customerRef = doc(db, "customers", customerId);
-    const docSnap = await getDoc(customerRef);
-    
-    console.log("removeTemplate")
-    console.log(customerId)
-    console.log(templateIndex)
 
-    if (docSnap.exists()) {
-        var newData = docSnap.data();
-        newData.templates.splice(templateIndex, 1)
-        await updateDoc(customerRef, newData)
-    } else {
-      console.log("removeTemplate - No such document!");
-    }
+const addTemplate = async (customerId, newTemplate, oldTemplateName) => {
+
+    return addCustomerConfig(customerId, "templates", newTemplate, "templateName", oldTemplateName)
+
+}
+
+const addPosition = async (customerId, newPosition, oldPositionName) => {
+
+    return addCustomerConfig(customerId, "positions", newPosition, "positionName", oldPositionName)
+
+}
+
+const addDesign = async (customerId, newDesign, oldDesignName ) => {
+    
+    return addCustomerConfig(customerId, "designs", newDesign, "designName", oldDesignName)
+
+}
+
+const removeTemplate = async (customerId, deleteTemplateName) => {
+    removeCustomerConfig(customerId, "templates", "templateName", deleteTemplateName)
+}
+
+
+const removePosition = async (customerId, deletePositionName) => {
+    removeCustomerConfig(customerId, "positions", "positionName", deletePositionName)
+}
+
+const removeDesign = async (customerId, deleteDesignName) => {
+    removeCustomerConfig(customerId, "designs", "designName", deleteDesignName)
 }
 
 const removeTemplatePosition = async (customerId, templateIndex, positionIndex) => {
@@ -202,53 +211,15 @@ const removeTemplatePosition = async (customerId, templateIndex, positionIndex) 
     }
 }
 
-const removePosition = async (customerId, deletePositionName) => {
-    const customerRef = doc(db, "customers", customerId);
-    const docSnap = await getDoc(customerRef);
 
-    if (docSnap.exists()) {
-        var newData = docSnap.data();
-        // no positions, nothing to do
-        if (!("positions" in newData)) {
-            return;
-        } 
-        const indexExists = newData.positions.findIndex((pos) => pos.positionName === deletePositionName)
-        if (indexExists === -1) {
-            return;
-        }
-
-        newData.positions.splice(indexExists, 1);
-        await updateDoc(customerRef, newData);
-        
-    } else {
-        console.log("removePosition - No such document!");
-    }
-}
-
-const removeSet = async (customerId, setIndex) => {
-    const customerRef = doc(db, "customers", customerId);
-    const docSnap = await getDoc(customerRef);
-
-    console.log("removeSet")
-    console.log(customerId)
-    console.log(setIndex)
-
-    if (docSnap.exists()) {
-        var newData = docSnap.data();
-        newData.sets.splice(setIndex, 1)
-        await updateDoc(customerRef, newData)
-    } else {
-      console.log("removeSet - No such document!");
-    }
-}
 
 export {    getCurrentUser, 
             addTemplate, 
             removeTemplate, 
             addTemplatePosition, 
             removeTemplatePosition,
-            addSet,
-            removeSet,
+            addDesign,
+            removeDesign,
             addPosition,
             removePosition
         }

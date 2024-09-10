@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { Navigate } from "react-router-dom";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
+import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Container, Row, Col } from "react-bootstrap";
 import TemplatesList from "./TemplatesList"
 import TemplateImage from "./TemplateImage"
@@ -13,13 +14,12 @@ import TemplatePositionEditModal from './TemplatePositionEditModal';
 const Templates = () => {
 
   const [templateIndex, setTemplateIndex] = useState('0')
-  const [positionIndex, setPositionIndex] = useState(0)
   const [displayTemplateEdit, setDisplayTemplateEdit] = useState(false);
   const [displayPositionEdit, setDisplayPositionEdit] = useState(false);
   const [showPositionRect, setShowPositionRect] = useState({})
   const [imageProps, setImageProps] = useState({})
-  const [modeTemplateEdit, setModeTemplateEdit] = useState("new")
-  const [modePositionEdit, setModePositionEdit] = useState("new")
+  const [oldTemplate, setOldTemplate] = useState(null)
+  const [oldTemplatePosition, setOldTemplatePosition] = useState(null)
 
   const onTemplateListClick = (e) => {
     e.preventDefault();
@@ -29,46 +29,51 @@ const Templates = () => {
 
   const hideTemplateEdit = () => {
     setDisplayTemplateEdit(false);
-    setModeTemplateEdit("new")
   };
 
   const hidePositionEdit = () => {
-    setDisplayPositionEdit(false);
-    setModePositionEdit("new")
+    setDisplayPositionEdit(false)
+  };
+
+  const resetList = () => {
+    setTemplateIndex(0)
   };
 
   const onNewTemplateClick = (e) => {
     e.preventDefault();
-    setModeTemplateEdit("new");
+    setOldTemplate(null);
     setDisplayTemplateEdit(true);
   }
 
   const onEditTemplateClick = (e) => {
     e.preventDefault();
-    setModeTemplateEdit("edit");
+    setOldTemplate(currentCustomer.templates[e.target.id]);
     setDisplayTemplateEdit(true);
   }
 
   const onNewPositionClick = (e) => {
     e.preventDefault();
-    setModePositionEdit("new");
+    setOldTemplatePosition(null);
     setDisplayPositionEdit(true);
   }
 
   const onEditPositionClick = (e) => {
     e.preventDefault();
-    setPositionIndex(e.target.id)
-    setModePositionEdit("edit");
+    setOldTemplatePosition(currentCustomer.templates[templateIndex].positions[e.target.id]);
     setDisplayPositionEdit(true);
   }
 
   //load data
   const authEmail = useAuth();
+  const currentCustomer = useCurrentCustomer();
 
   //if not logged in, redirect to login page
   if (!authEmail) {
     return <Navigate to="/login" />;
   }
+
+  //wait for data
+  if (!currentCustomer ) return "Loading...";
 
   return (
     <>
@@ -79,6 +84,7 @@ const Templates = () => {
               onListClick={onTemplateListClick} 
               onNewClick={onNewTemplateClick}
               onEditClick={onEditTemplateClick}
+              resetList={resetList}
             />
           </Col>
           <Col>
@@ -102,15 +108,14 @@ const Templates = () => {
         showModal={displayTemplateEdit} 
         hideModal={hideTemplateEdit}
         templateIndex={templateIndex} 
-        mode={modeTemplateEdit}
+        oldTemplate={oldTemplate}
       />
       <TemplatePositionEditModal 
         showModal={displayPositionEdit} 
         hideModal={hidePositionEdit} 
         imageProps={imageProps}
         templateIndex={templateIndex}
-        positionIndex={positionIndex}
-        mode={modePositionEdit}
+        oldTemplatePosition={oldTemplatePosition}
       />
       
     </>
