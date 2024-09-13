@@ -42,17 +42,17 @@ const PositionEditModal = (props) => {
       setDisabledSave();
       const newPosition = {
         "positionName": positionName,
-        "arWidth": arWidth,
-        "arHeight": arHeight
+        "arWidth": Number(arWidth),
+        "arHeight": Number(arHeight)
       }
-      const result = await addPosition(props.currentCustomer.id, newPosition, props.oldPosition?.positionName);
-      if (result.error) {
-        setErrorMsg(result.error);
-      } else {
-        props.hideModal();
-        setErrorMsg("");
+      try {
+        await addPosition(props.currentCustomer.id, newPosition, props.oldPosition?.positionName)
       }
-  
+      catch (error) {
+        setErrorMsg(error.message)
+        return
+      }
+      props.hideModal();
     }
   
     const onCancel = (e) => {

@@ -1,13 +1,29 @@
 import React, {useState} from 'react';
 import "./Common.css"
-import { Button, Form, Modal, Alert } from "react-bootstrap";
+import { Button, Form, Modal, Alert, ProgressBar } from "react-bootstrap";
 import { addDesign } from "../data/DataUtils"
+import { getImageSize, getFileLocation } from "./Utils"
+import { uploadFileProgress } from "../data/FileUtils"
 
 const DesignEditModal = (props) => {
 
   const [designName, setDesignName] = useState("")
-  const [disabledSave, setDisabledSave] = useState(false);
+  const [file, setFile] = useState(null)
+  const [showProgress, setShowProgress] = useState(false)
+  const [progresspercent, setProgresspercent] = useState(0)
+  const [disabledSave, setDisabledSave] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
+
+  const showProgressPercent = (percent) => {
+    setProgresspercent(percent)
+  }
+
+  const onFileChange = (e) => {
+    const files = e.target.files
+    if (!files[0]) return
+
+    setFile(files[0])
+  }
 
   const initModal = () => {
     if (props.oldDesign) {
@@ -15,6 +31,33 @@ const DesignEditModal = (props) => {
     } else {
       setDesignName("");
     }
+  }
+
+  const saveDesign = async (fileLocation, downloadURL) => {
+    console.log("saveDesign")
+    const imageDimensions = await getImageSize(downloadURL)
+    console.log(imageDimensions)
+    const newDesign = {
+      "fileLocation": fileLocation,
+      "imageUrl": downloadURL,
+      "designName": designName,
+      "imageWidth": imageDimensions.width,
+      "imageHeight": imageDimensions.height
+    }
+    console.log(newDesign)
+
+    await addDesign(props.currentCustomer.id, newDesign, props.oldDesign?.designName);
+  }
+
+  const justSave = async () => {
+    await saveDesign(props.currentCustomer.designs[props.designIndex].fileLocation, props.currentCustomer.designs[props.designIndex].imageUrl)
+  }
+  
+  const uploadAndSave = async (fileLocation) => {
+    setShowProgress(true)
+    const downloadURL = await uploadFileProgress(fileLocation, file, showProgressPercent)
+    await saveDesign(fileLocation, downloadURL)
+    setShowProgress(false)
   }
 
   const onSave = async (e) => {
@@ -25,19 +68,27 @@ const DesignEditModal = (props) => {
       return;
     }
 
-    setDisabledSave();
-    const newDesign = {
-        "designName": designName,
-        "imageUrl": null
+    if (( !file && !props.oldDesign )) {
+      setErrorMsg("Je potřeba vybrat nějaký soubor s fotkou vzoru")
+      return
     }
 
-    const result = await addDesign(props.currentCustomer.id, newDesign, props.oldDesign?.designName)
-    if (result.error) {
-      setErrorMsg(result.error);
-    } else {
-      props.hideModal();
-      setErrorMsg("");
+    setDisabledSave();
+
+    try {
+      if (!file && props.oldDesign) {
+        await justSave()
+      } else if (file) {
+        const fileLocation = getFileLocation(props.currentCustomer.id, "designs", file.name)
+        await uploadAndSave(fileLocation);
+      }
     }
+    catch (error) {
+      setErrorMsg(error.message)
+      return
+    }
+
+    props.hideModal();
 
   }
 
@@ -51,7 +102,21 @@ const DesignEditModal = (props) => {
     <>        
       <Modal show={props.showModal} onHide={props.hideModal} onEnter={initModal} backdrop="static">
         <Modal.Body>
+        { showProgress && <ProgressBar stripped="true" variant="info" now={progresspercent} />}
           <Form>
+            <Form.Group>
+              <Form.Label className="col-form-label-sm">Soubor se vzorem</Form.Label>
+              <Form.Control 
+                type="file" 
+                size='sm'
+                id="fileName"
+                name="fileName"
+                placeholder='Vyber soubor se vzorem'
+                accept="image/png, image/jpeg"
+                required
+                onChange={onFileChange}
+              />
+            </Form.Group>
             <Form.Group>
               <Form.Label className="col-form-label-sm">Název vzoru</Form.Label>
               <Form.Control 

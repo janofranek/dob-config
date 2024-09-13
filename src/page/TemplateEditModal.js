@@ -3,7 +3,8 @@ import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Button, Form, ProgressBar, Modal, Alert } from "react-bootstrap";
 import { addTemplate } from "../data/DataUtils"
-import { uploadFile } from "../data/FileUtils"
+import { uploadFileProgress } from "../data/FileUtils"
+import { getFileLocation } from "./Utils"
 
 const TemplateEditModal = (props) => {
   const [templateName, setTemplateName] = useState("")
@@ -18,16 +19,8 @@ const TemplateEditModal = (props) => {
   //wait for data
   if (!currentCustomer ) return "Loading..."
 
-  const showProgressBar = (show) => {
-    setShowProgress(show)
-  }
-
   const showProgressPercent = (percent) => {
     setProgresspercent(percent)
-  }
-
-  const setErrorMessage = (msg) => {
-    setErrorMsg(msg)
   }
 
   const onFileChange = (e) => {
@@ -46,30 +39,46 @@ const TemplateEditModal = (props) => {
     setFile(null)
   }
 
-  const saveTemplate = (downloadURL) => {
+  const saveTemplate = async (fileLocation, downloadURL) => {
     const newTemplate = {
+      "fileLocation": fileLocation,
       "imageUrl": downloadURL,
-      "templateName": templateName,
+      "templateName": templateName
     }
-    return addTemplate(currentCustomer.id, newTemplate);
+    try {
+      await addTemplate(currentCustomer.id, newTemplate, props.oldTemplate?.templateName);
+    }
+    catch (error) {
+      setErrorMsg(error.message)
+    }
   }
 
-  const justSave = () => {
-    console.log("justSave")
-    return saveTemplate(currentCustomer.templates[props.templateIndex].imageUrl)
+  const justSave = async () => {
+    try {
+      await saveTemplate(currentCustomer.templates[props.templateIndex].fileLocation, currentCustomer.templates[props.templateIndex].imageUrl)
+    }
+    catch (error) {
+      setErrorMsg(error.message)
+    }
   }
-
   
-  const uploadAndSave = (fileLocation) => {
+  const uploadAndSave = async (fileLocation) => {
 
-    uploadFile(fileLocation, file, showProgressBar, showProgressPercent, saveTemplate, setErrorMessage)
+    setShowProgress(true)
+
+    try {
+      const downloadURL = await uploadFileProgress(fileLocation, file, showProgressPercent)
+      await saveTemplate(fileLocation, downloadURL)
+    }
+    catch (error) {
+      setErrorMsg(error.message)
+    }
+
+    setShowProgress(false)
 
   }
 
-  const onSave = (e) => {
-    var result = {}
-    console.log("onSave")
-
+  const onSave = async (e) => {
     e.preventDefault();
 
     if (!templateName) {
@@ -77,26 +86,27 @@ const TemplateEditModal = (props) => {
       return
     }
 
-    if (( !file && props.mode === "new" )) {
+    if (( !file && !props.oldTemplate )) {
       setErrorMsg("Je potřeba vybrat nějaký soubor s fotkou podkladu")
       return
     }
 
     setDisabledSave();
-  
-    if (!file && props.mode === "edit") {
-      result = justSave()
-    } else if (file) {
-      console.log("uploadAndSave")
-      const fileLocation = `${currentCustomer.id}/templates/${templateName}_${file.name}`;
-      result = uploadAndSave(fileLocation);
-      console.log(result)
+
+    try {
+      if (!file && props.oldTemplate) {
+        await justSave()
+      } else if (file) {
+        const fileLocation = getFileLocation(currentCustomer.id, "templates", file.name)
+        await uploadAndSave(fileLocation);
+      }
     }
-    console.log("onSave - finish")
-    console.log(errorMsg)
-    if (!errorMsg) {
-      props.hideModal();
+    catch (error) {
+      setErrorMsg(error.message)
+      return
     }
+
+    props.hideModal();
 
   }
 

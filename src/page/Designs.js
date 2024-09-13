@@ -4,7 +4,7 @@ import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Container, Button, Row, Col } from 'react-bootstrap';
-import DesignDetail from './DesignDetail';
+import DesignImage from './DesignImage';
 import DesignsList from './DesignsList';
 import DesignEditModal from './DesignEditModal';
 
@@ -82,10 +82,9 @@ const Designs = () => {
               />
             </Col>
             <Col md="auto">
-              <DesignDetail 
+              <DesignImage 
                 currentCustomer={currentCustomer}
                 designIndex={designIndex} 
-                onEditClick={onEditDesignClick}
               />
             </Col>
           </Row>
