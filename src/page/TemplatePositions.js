@@ -4,6 +4,7 @@ import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Button, Table } from "react-bootstrap";
 import DeleteConfirmation from './DeleteConfirmation';
 import { removeTemplatePosition } from "../data/DataUtils"
+import { getPositionObject, getHeightFromAR } from "./Utils"
 
 const TemplatePositions = (props) => {
   const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
@@ -19,6 +20,9 @@ const TemplatePositions = (props) => {
       setTemplateDataFromParent({imageUrl:null, templateName:null, negative:false, positions:[]})
     }
   }, [props, currentCustomer])
+
+  //wait for data
+  if (!currentCustomer ) return "Loading...";
 
   const submitDelete = () => {
     removeTemplatePosition(currentCustomer.id, Number(props.templateIndex), Number(positionIndex))
@@ -39,17 +43,15 @@ const TemplatePositions = (props) => {
   const onPositionShow = (e) => {
     e.preventDefault();
 
+    const positionObject = getPositionObject(currentCustomer, templateDataFromParent.positions[e.target.id].positionName)
     const newPosition = {
       left: templateDataFromParent.positions[e.target.id].left,
       top: templateDataFromParent.positions[e.target.id].top,
       width: templateDataFromParent.positions[e.target.id].width,
-      height: templateDataFromParent.positions[e.target.id].height
+      height: getHeightFromAR( templateDataFromParent.positions[e.target.id].width, positionObject )
     }
     props.setShowPositionRect(newPosition)
   }
-
-  //wait for data
-  if (!currentCustomer ) return "Loading...";
 
   return (
     <>
@@ -67,7 +69,7 @@ const TemplatePositions = (props) => {
             <tr>
               <th>#</th>
               <th>Obrázek</th>
-              <th>L/H/Š/V</th>
+              <th>L/H/Š</th>
               <th></th>
             </tr>
           </thead>
@@ -77,7 +79,7 @@ const TemplatePositions = (props) => {
                 <tr key={index}>
                   <td id={index}>{index+1}</td>
                   <td id={index}>{row.positionName}</td>
-                  <td id={index}>{row.left}/{row.top}/{row.width}/{row.height}</td>
+                  <td id={index}>{row.left}/{row.top}/{row.width}</td>
                   <td>
                     <Button
                       variant="outline-danger"

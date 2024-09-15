@@ -40,7 +40,6 @@ const Home = () => {
               <Card.Body>
                 <Card.Title>TODO - GUI konfigurace</Card.Title>
                 <ListGroup variant='flush'>
-                  <ListGroup.Item>Podklady - aplikovat AR z obrázku</ListGroup.Item>
                   <ListGroup.Item>Podklady - definice obrázků na procenta</ListGroup.Item>
                   <ListGroup.Item>Podklady a Vzory - při změně fotky u podkladu nebo vzoru smazat starou fotku</ListGroup.Item>
                   <ListGroup.Item>Podklady a Vzory - při mazání smazat i fotku</ListGroup.Item>

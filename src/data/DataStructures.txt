@@ -2,8 +2,8 @@ customers
   id
   positions - array
     positionName
-    width
-    height
+    arWidth
+    arHeight
   templates - array
     fileLocation
     imageUrl
@@ -13,13 +13,12 @@ customers
       left
       top
       width
-      X height
   designs - array
     fileLocation
     imageUrl
     designName
-    width
-    height
+    imageWidth
+    imageHeight
 users
   id -> email
   email

@@ -24,7 +24,7 @@ const existsDesign = (currentCustomer) => {
 
 const Designs = () => {
 
-  const [designIndex, setDesignIndex] = useState(null)
+  const [designIndex, setDesignIndex] = useState("0")
   const [displayDesignEdit, setDisplayDesignEdit] = useState(false);
   const [oldDesign, setOldDesign] = useState(null);
 

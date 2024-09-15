@@ -28,7 +28,7 @@ const InputNumber = (props) => {
   
   const onChange = (e) => {
     e.preventDefault();
-    props.onNumberChange(e.target.value)
+    props.onNumberChange(Number(e.target.value))
   }
 
   return (
@@ -59,9 +59,30 @@ const checkInteger = (inputString) => {
         inputNumber > 0 )
 }
 
+const getHeightFromAR = (inWidth, positionObject) => {
+  if (!positionObject || !positionObject.arWidth) {
+    return inWidth
+  } else {
+    return Math.floor( inWidth / positionObject.arWidth * positionObject.arHeight )
+  }
+}
+
+const getPositionObject = (currentCustomer, positionName) => {
+  try {
+    const positions = currentCustomer.positions.filter((pos) => pos.positionName === positionName)
+    if (positions.length > 0) {
+      return positions[0]
+    }
+  } 
+  catch (error) {}
+  return null
+}
+
 export {
     InputNumber,
     checkInteger,
     getImageSize,
-    getFileLocation
+    getFileLocation,
+    getHeightFromAR,
+    getPositionObject
 }

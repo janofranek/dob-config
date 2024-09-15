@@ -3,10 +3,11 @@ import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
 import { Button, Form, Modal, Row, Col, Alert } from "react-bootstrap";
 import { addTemplatePosition } from "../data/DataUtils" 
-import { InputNumber, checkInteger } from "./Utils"
+import { InputNumber, checkInteger, getPositionObject, getHeightFromAR } from "./Utils"
 
 const TemplatePositionEditModal = (props) => {
   const [positionName, setPositionName] = useState("")
+  const [positionObject, setPositionObject] = useState(null)
   const [left, setLeft] = useState(0)
   const [top, setTop] = useState(0)
   const [width, setWidth] = useState(0)
@@ -21,11 +22,12 @@ const TemplatePositionEditModal = (props) => {
 
   const initModal = () => {
     if (props.oldTemplatePosition) {
+      setPositionObject(getPositionObject(currentCustomer, props.oldTemplatePosition.positionName))
       setPositionName(props.oldTemplatePosition.positionName)
       setLeft(props.oldTemplatePosition.left)
       setTop(props.oldTemplatePosition.top)
       setWidth(props.oldTemplatePosition.width)
-      setHeight(props.oldTemplatePosition.height)
+      setHeight(getHeightFromAR(props.oldTemplatePosition.width, positionObject))
     } else {
       setPositionName("")
       setLeft(0)
@@ -33,6 +35,18 @@ const TemplatePositionEditModal = (props) => {
       setWidth(0)
       setHeight(0)
     }
+  }
+
+  const onSetPositionName = (e) => {
+    const positionObjectTemp =  getPositionObject(currentCustomer, e.target.value)
+    setPositionObject(positionObjectTemp)
+    setPositionName(e.target.value)
+    setHeight(getHeightFromAR(width, positionObjectTemp))
+  }
+
+  const onSetWidth = (inWidth) => {
+    setWidth(inWidth)
+    setHeight(getHeightFromAR(inWidth, positionObject))
   }
 
   const onSave = async (e) => {
@@ -60,21 +74,21 @@ const TemplatePositionEditModal = (props) => {
     }
 
     setDisabledSave();
-    const newPosition = {
-      "positionName": positionName,
-      "left": left,
-      "top": top,
-      "width": width,
-      "height": height
-    }
 
-    const result = await addTemplatePosition(currentCustomer.id, Number(props.templateIndex), newPosition, props.oldTemplatePosition?.positionName);
-    if (result.error) {
-      setErrorMsg(result.error);
-    } else {
-      props.hideModal();
-      setErrorMsg("");
+    try {
+      const newPosition = {
+        "positionName": positionName,
+        "left": left,
+        "top": top,
+        "width": width
+      }
+      await addTemplatePosition(currentCustomer.id, Number(props.templateIndex), newPosition, props.oldTemplatePosition?.positionName);
     }
+    catch (error) {
+      setErrorMsg(error.message)
+      return
+    }
+    props.hideModal();
 
   }
 
@@ -93,7 +107,7 @@ const TemplatePositionEditModal = (props) => {
                 value={positionName}
                 // defaultValue={positionName}
                 required
-                onChange={(e)=>setPositionName(e.target.value)}
+                onChange={(e) => { onSetPositionName(e)}}
               >
                 <option>Vyber pozici ze seznamu</option>
                 {currentCustomer.positions.map((row, index) => {
@@ -108,18 +122,27 @@ const TemplatePositionEditModal = (props) => {
             </Form.Text>
             <Row>
               <Col>
-                <InputNumber labelName="Zleva" numberName="left" value={left} onNumberChange={setLeft}/>
+                <InputNumber labelName="Zleva" numberName="left" value={left} min="1" onNumberChange={setLeft}/>
               </Col>
               <Col>
-                <InputNumber labelName="Zhora" numberName="top" value={top} onNumberChange={setTop}/>
+                <InputNumber labelName="Zhora" numberName="top" value={top} min="1" onNumberChange={setTop}/>
               </Col>
             </Row>
             <Row>
               <Col>
-                <InputNumber labelName="Šířka" numberName="width" value={width} onNumberChange={setWidth}/>
+                <InputNumber labelName="Šířka" numberName="width" value={width} min="1" onNumberChange={onSetWidth}/>
               </Col>
               <Col>
-                <InputNumber labelName="Výška" numberName="height" value={height} onNumberChange={setHeight}/>
+                <Form.Group>
+                  <Form.Label className="col-form-label-sm">Výška</Form.Label>
+                  <Form.Control 
+                    type="number"
+                    size='sm' 
+                    name="height"
+                    value={height}
+                    readOnly
+                  />
+                </Form.Group>
               </Col>
             </Row>
           </Form>
