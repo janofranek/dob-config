@@ -100,12 +100,12 @@ const Mockup = () => {
           </Form.Select>
         </Form.Group>
         <Form.Group>
-          <Form.Label className="col-form-label-sm">Název pozice</Form.Label>
+          <Form.Label className="col-form-label-sm">Název obrázku</Form.Label>
           <Form.Select 
             size='sm' 
             id="positionName"
             name="positionName"
-            placeholder='Zadej název pozice'
+            placeholder='Zadej název obrázku'
             value={positionName}
             required
             onChange={(e) => { onSetPositionName(e)}}

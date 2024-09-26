@@ -6,6 +6,7 @@ import LoginRegister from './page/LoginRegister';
 import Positions from './page/Positions';
 import Templates from './page/Templates';
 import Designs from './page/Designs';
+import Mockup from './page/Mockup';
 import NoPage from './page/NoPage';
 import { AuthProvider } from "./data/AuthProvider"
 import { UsersDataProvider } from "./data/UsersDataProvider"
@@ -22,6 +23,7 @@ function AppRouter() {
             <Route path="positions" element={<Positions/>} />
             <Route path="templates" element={<Templates/>} />
             <Route path="designs" element={<Designs/>} />
+            <Route path="mockup" element={<Mockup/>} />
             <Route path="*" element={<NoPage/>} />
           </Route>
         </Routes>

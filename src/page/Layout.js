@@ -56,6 +56,7 @@ const Layout = () => {
                   <Nav.Link as={Link} to="/positions">Obrázky</Nav.Link>
                   <Nav.Link as={Link} to="/templates">Podklady</Nav.Link>
                   <Nav.Link as={Link} to="/designs">Vzory</Nav.Link>
+                  <Nav.Link as={Link} to="/Mockup">Mockup</Nav.Link>
                   </>
               }
             </Nav>
