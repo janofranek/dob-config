@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
+import React, {useState} from 'react'
 import "./Common.css"
 import { useCurrentCustomer } from "../data/CurrentCustomerProvider"
-import { Button, Table } from "react-bootstrap";
-import DeleteConfirmation from './DeleteConfirmation';
+import { Button, Table } from "react-bootstrap"
+import DeleteConfirmation from './DeleteConfirmation'
 import { removeTemplate} from "../data/DataUtils"
 
 const existsTemplate = (currentCustomer) => {
+  return currentCustomer?.templates?.length > 0
+  /*
   if (!(typeof currentCustomer === "object")) {
     return false
   } else if (!("templates" in currentCustomer)) {
@@ -17,36 +19,38 @@ const existsTemplate = (currentCustomer) => {
   } else {
     return true
   }
+  */
 }
 
 const TemplatesList = (props) => {
-  const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
-  const [deleteMessage, setDeleteMessage] = useState(null);
-  const [deleteTemplateName, setDeleteTemplateName] = useState("");
+  const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false)
+  const [deleteMessage, setDeleteMessage] = useState(null)
+  const [deleteTemplateName, setDeleteTemplateName] = useState("")
 
-  const currentCustomer = useCurrentCustomer();
+  const currentCustomer = useCurrentCustomer()
   //wait for data
-  if (!currentCustomer ) return "Loading...";
+  if (!currentCustomer ) return "Loading..."
 
   const submitDelete = () => {
     removeTemplate(currentCustomer.id, deleteTemplateName)
     props.resetList()
     setDisplayConfirmationModal(false);
-  };
+  }
 
   const hideConfirmationModal = () => {
     setDisplayConfirmationModal(false);
-  };
+  }
+
   const onTemplateDelete = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     setDeleteTemplateName(currentCustomer.templates[e.target.id].templateName)
-    setDeleteMessage(`Opravdu chceš smazat podklad '${currentCustomer.templates[e.target.id].templateName}'?`);
-    setDisplayConfirmationModal(true);
+    setDeleteMessage(`Opravdu chceš smazat podklad '${currentCustomer.templates[e.target.id].templateName}'?`)
+    setDisplayConfirmationModal(true)
   }
 
   const onTemplateEdit = (e) => {
-    e.preventDefault();
-    props.onEditClick(e);
+    e.preventDefault()
+    props.onEditClick(e)
   }
 
   return ( 
@@ -54,7 +58,7 @@ const TemplatesList = (props) => {
       <Button
         variant="primary"
         size='sm'
-        type="submit"
+        type="button"
         onClick={props.onNewClick}>
         Nový podklad
       </Button>
@@ -72,14 +76,14 @@ const TemplatesList = (props) => {
             <tbody>
               {currentCustomer.templates.map( (row, index) => {
                 return (
-                  <tr key={index} onClick={props.onListClick}>
-                    <td id={index} >{index+1}</td>
-                    <td id={index} >{row.templateName}</td>
+                  <tr key={row.templateName} onClick={props.onListClick}>
+                    <td id={index}>{index+1}</td>
+                    <td id={index}>{row.templateName}</td>
                     <td>
                       <Button
                         variant="outline-danger"
                         size='sm'
-                        type="submit"
+                        type="button"
                         id={index}
                         onClick={onTemplateDelete}>
                         Smaž
@@ -87,7 +91,7 @@ const TemplatesList = (props) => {
                       <Button
                         variant="outline-primary"
                         size='sm'
-                        type="submit"
+                        type="button"
                         id={index}
                         onClick={onTemplateEdit}>
                         Uprav

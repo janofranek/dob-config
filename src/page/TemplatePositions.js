@@ -58,7 +58,7 @@ const TemplatePositions = (props) => {
       <Button
         variant="primary"
         size='sm'
-        type="submit"
+        type="button"
         onClick={props.onNewClick}>
         Nový obrázek
       </Button>
@@ -84,7 +84,7 @@ const TemplatePositions = (props) => {
                     <Button
                       variant="outline-danger"
                       size='sm'
-                      type="submit"
+                      type="button"
                       id={index}
                       onClick={onPositionDelete}>
                       Smaž
@@ -93,7 +93,7 @@ const TemplatePositions = (props) => {
                     <Button
                       variant="outline-info"
                       size='sm'
-                      type="submit"
+                      type="button"
                       id={index}
                       onClick={onPositionShow}>
                       Ukaž
@@ -102,7 +102,7 @@ const TemplatePositions = (props) => {
                     <Button
                       variant="outline-primary"
                       size='sm'
-                      type="submit"
+                      type="button"
                       id={index}
                       onClick={props.onEditClick}>
                       Uprav

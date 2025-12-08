@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import { Navigate } from "react-router-dom";
 import "./Common.css"
 import { useAuth } from '../data/AuthProvider';
@@ -13,55 +13,55 @@ import TemplatePositionEditModal from './TemplatePositionEditModal';
 
 const Templates = () => {
 
-  const [templateIndex, setTemplateIndex] = useState('0')
+  const [templateIndex, setTemplateIndex] = useState(0)
   const [displayTemplateEdit, setDisplayTemplateEdit] = useState(false);
   const [displayPositionEdit, setDisplayPositionEdit] = useState(false);
-  const [showPositionRect, setShowPositionRect] = useState({})
-  const [imageProps, setImageProps] = useState({})
+  const [showPositionRect, setShowPositionRect] = useState(null)
+  const [imageProps, setImageProps] = useState(null)
   const [oldTemplate, setOldTemplate] = useState(null)
   const [oldTemplatePosition, setOldTemplatePosition] = useState(null)
 
-  const onTemplateListClick = (e) => {
+  const onTemplateListClick = useCallback((e) => {
     e.preventDefault();
-    setShowPositionRect({})
-    setTemplateIndex(e.target.id);
-  }
+    setShowPositionRect(null)
+    setTemplateIndex(parseInt(e.target.id));
+  }, [])
 
-  const hideTemplateEdit = () => {
+  const hideTemplateEdit = useCallback(() => {
     setDisplayTemplateEdit(false);
-  };
+  }, [])
 
-  const hidePositionEdit = () => {
+  const hidePositionEdit = useCallback(() => {
     setDisplayPositionEdit(false)
-  };
+  }, [])
 
-  const resetList = () => {
+  const resetList = useCallback(() => {
     setTemplateIndex(0)
-  };
+  }, [])
 
-  const onNewTemplateClick = (e) => {
+  const onNewTemplateClick = useCallback((e) => {
     e.preventDefault();
     setOldTemplate(null);
     setDisplayTemplateEdit(true);
-  }
+  }, [])
 
-  const onEditTemplateClick = (e) => {
+  const onEditTemplateClick = useCallback((e) => {
     e.preventDefault();
-    setOldTemplate(currentCustomer.templates[e.target.id]);
+    setOldTemplate(currentCustomer.templates[parseInt(e.target.id)]);
     setDisplayTemplateEdit(true);
-  }
+  }, [])
 
-  const onNewPositionClick = (e) => {
+  const onNewPositionClick = useCallback((e) => {
     e.preventDefault();
     setOldTemplatePosition(null);
     setDisplayPositionEdit(true);
-  }
+  }, [])
 
-  const onEditPositionClick = (e) => {
+  const onEditPositionClick = useCallback((e) => {
     e.preventDefault();
-    setOldTemplatePosition(currentCustomer.templates[templateIndex].positions[e.target.id]);
+    setOldTemplatePosition(currentCustomer.templates[templateIndex].positions[parseInt(e.target.id)]);
     setDisplayPositionEdit(true);
-  }
+  }, [])
 
   //load data
   const authEmail = useAuth();
