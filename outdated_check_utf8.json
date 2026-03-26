@@ -1,0 +1,72 @@
+﻿{
+  "@testing-library/react": {
+    "current": "16.3.0",
+    "wanted": "16.3.2",
+    "latest": "16.3.2",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\@testing-library\\react"
+  },
+  "@vitejs/plugin-react": {
+    "current": "4.7.0",
+    "wanted": "4.7.0",
+    "latest": "6.0.1",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\@vitejs\\plugin-react"
+  },
+  "env-cmd": {
+    "current": "10.1.0",
+    "wanted": "10.1.0",
+    "latest": "11.0.0",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\env-cmd"
+  },
+  "firebase": {
+    "current": "12.6.0",
+    "wanted": "12.11.0",
+    "latest": "12.11.0",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\firebase"
+  },
+  "react": {
+    "current": "19.2.1",
+    "wanted": "19.2.4",
+    "latest": "19.2.4",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\react"
+  },
+  "react-dom": {
+    "current": "19.2.1",
+    "wanted": "19.2.4",
+    "latest": "19.2.4",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\react-dom"
+  },
+  "react-router-dom": {
+    "current": "7.10.1",
+    "wanted": "7.13.2",
+    "latest": "7.13.2",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\react-router-dom"
+  },
+  "vite": {
+    "current": "6.4.1",
+    "wanted": "6.4.1",
+    "latest": "8.0.3",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\vite"
+  },
+  "vitest": {
+    "current": "2.1.9",
+    "wanted": "2.1.9",
+    "latest": "4.1.1",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\vitest"
+  },
+  "web-vitals": {
+    "current": "5.1.0",
+    "wanted": "5.2.0",
+    "latest": "5.2.0",
+    "dependent": "dob-config",
+    "location": "C:\\dev\\dob-config\\node_modules\\web-vitals"
+  }
+}
