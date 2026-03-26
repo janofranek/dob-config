@@ -45,7 +45,7 @@ const Mockup = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "x-api-key": "f742f489-2f5f-43e6-8952-1a75a619f1ae"
+          "x-api-key": import.meta.env.VITE_DOB_API_KEY
         },
         body: JSON.stringify(params),
       });
